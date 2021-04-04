@@ -5,7 +5,9 @@
 
 A silent, customizable backdoor for Minecraft Bukkit/Spigot/Paper servers.
 
-GUI configuration and injection program comming soon.
+GUI configuration and injection program comming soon. (Maybe)
+
+This is pretty much a finished project in my mind, but if you come up with something cool feel free to throw a pull request.
 ## Requirements:
 * Java 8 (Newer works but is not reccomended) JDK
 * Desired target plugin's source code.
