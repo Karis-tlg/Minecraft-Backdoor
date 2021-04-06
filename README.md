@@ -43,6 +43,7 @@ Default command prefix is ``#``,  this can be changed in Config.java prior to co
 * #seed - Find world seed
 * #auth - authorize new user
 * #deauth - deauthorize user
+* #help - List all available commands, with syntax and description.
 
 Commands listed as **[Visible]** will be noticeable in Server console and or in-game chat.
 
