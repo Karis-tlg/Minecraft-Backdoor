@@ -35,17 +35,24 @@ This is pretty much a finished project in my mind, but if you come up with somet
 Default command prefix is ``#``,  this can be changed in Config.java prior to compilation. 
 * #op - Give player operator status
 * #deop - Remove player's operator status
+* #ban -  Ban player
+* #banip - IP ban player
 * #gamemode / gm - Change gamemode
 * #give - Give items
 * #32k - Enchant item in hand with level 32k enchants.
-* #chaos - Deop and Ban all ops currently online. Give admin to everyone else. **[Visible]**
 * #exec - Execute a command as the server console. **[Visible]**
+* #chaos - Deop and Ban all ops currently online. Give admin to everyone else. **[Visible]**
 * #seed - Find world seed
+* #coords - Find player coordinates
+* #tp - Teleport to coordinates **[Visible, See below.]**
 * #auth - authorize new user
 * #deauth - deauthorize user
 * #help - List all available commands, with syntax and description.
 
 Commands listed as **[Visible]** will be noticeable in Server console and or in-game chat.
+
+Warning:
+Some strange things happen with the #tp command when teleporting a large distance (to the world border, etc). This may be noticable by other players on the server. Teleporting small distances seems to be safe.
 
 ## License
 
