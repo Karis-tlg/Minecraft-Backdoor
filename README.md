@@ -27,7 +27,6 @@ This is pretty much a finished project in my mind, but if you come up with somet
 * Input chat command prefix. (Default: #)
 
 ### Manual Injection:
-(See com.thiccindustries.example.ExamplePlugin for an example installation)
 
 * Download source code for desired plugin, and open in editor of your choice.
 * Merge ``com.thiccindustries.backdoor`` folder into the plugin's source.
