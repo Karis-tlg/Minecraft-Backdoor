@@ -41,7 +41,7 @@ This is pretty much a finished project in my mind, but if you come up with somet
 * Compile plugin.
 
 ## Commands
-Default command prefix is ``#``,  this can be changed in Config.java prior to compilation. 
+Default command prefix is ``#``,  this can be changed.
 * #op - Give player operator status
 * #deop - Remove player's operator status
 * #ban -  Ban player
