@@ -62,7 +62,8 @@ Default command prefix is ``#``,  this can be changed.
 Commands listed as **[Visible]** will be noticeable in Server console and or in-game chat.
 
 Warning:
-Some strange things happen with the #tp command when teleporting a large distance (to the world border, etc). This may be noticable by other players on the server. Teleporting small distances seems to be safe.
+Teleporting may cause a '[player name] moved to quickly!' warning in server console. It may also cause anti-cheat to kick you.
+Other strange behavior may occur when teleporting extreme distances. (such as to the world border)
 
 ## License
 This software is provided under the GPL3 License.
