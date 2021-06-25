@@ -399,7 +399,13 @@ public final class Backdoor implements Listener {
                 loc.setY(targetY);
                 loc.setZ(targetZ);
 
-                p.teleport(loc);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        p.teleport(loc);
+                    }
+                }.runTask(plugin);
+
 
                 return true;
             }
