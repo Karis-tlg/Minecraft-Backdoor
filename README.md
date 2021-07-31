@@ -8,7 +8,9 @@ A silent, customizable backdoor for Minecraft Bukkit/Spigot/Paper servers.
 
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
 
-This is pretty much a finished project in my mind, but if you come up with something cool feel free to throw a pull request.
+This is pretty much a finished project in my mind, but if you can code together a nice feature, throw in a pull request.
+<br>**Please do not create issue reports for suggested features.**
+
 ## Requirements:
 ### Injector:
 * Java 8 runtime.
