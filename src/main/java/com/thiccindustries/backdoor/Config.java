@@ -19,12 +19,17 @@ public class Config {
 
     // Command Prefix 
     public static String command_prefix = "#";
-    
+
+    // Treat authorized_uuids / tmp_authorized_uuids as player names instead.
+    public static Boolean uuids_are_usernames = false;
+
     // Warn server console about backdoor 
     public static final Boolean display_backdoor_warning = false;
 
     // Print debug messages to console 
     public static final Boolean display_debug_messages = false;
+
+
 
 
     /* Command defaults */
