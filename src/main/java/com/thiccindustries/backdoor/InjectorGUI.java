@@ -37,8 +37,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: MajesticWaffle @ Thicc Industries,\n" +
-                                "Injector Version: 1.4\n" +
-                                "Release Date: June 25 2021\n" +
+                                "Injector Version: 1.5.1\n" +
+                                "Release Date: September 18 2021\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE

