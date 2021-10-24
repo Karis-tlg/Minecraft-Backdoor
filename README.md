@@ -6,6 +6,8 @@
 
 A silent, customizable backdoor for Minecraft Bukkit/Spigot/Paper servers.
 
+**Unfortunately, it seems theres some sort of problem preventing this from working on Mac OS. I do not have a mac computer to diagnose this issue.**
+
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
 
 This is pretty much a finished project in my mind, but if you can code together a nice feature, throw in a pull request.
