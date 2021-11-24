@@ -7,7 +7,7 @@
 A silent, spreading backdoor for Minecraft Bukkit/Spigot/Paper servers.
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
 
-Do not use maliciously.
+For educational purposes only. Do not use on a server you do not own.
 
 ## Requirements:
 ### Injector:
