@@ -1,17 +1,10 @@
 
-
-
-
 # Thicc Industries' Minecraft Backdoor
 
-A silent, customizable backdoor for Minecraft Bukkit/Spigot/Paper servers.
-
-**Unfortunately, it seems theres some sort of problem preventing this from working on Mac OS. I do not have a mac computer to diagnose this issue. Running the injector from the Terminal fixes this for some.**
-
+** The Injector does not seem to be working under Mac OS for some. Please do not create duplicate issues for this. **
+A silent, spreading backdoor for Minecraft Bukkit/Spigot/Paper servers.
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
-
-This is pretty much a finished project in my mind, but if you can code together a nice feature, throw in a pull request.
-<br>**Please do not create issue reports for suggested features.**
+Do not use maliciously.
 
 ## Requirements:
 ### Injector:
@@ -74,5 +67,3 @@ Other strange behavior may occur when teleporting extreme distances. (such as to
 This software is provided under the GPL3 License.
 
 Credit to **Rikonardo** for his [Bukloit](https://github.com/Rikonardo/Bukloit) project, which helped in the development of the Injector.
-
-Oh and also don't yell at me if someone breaks your server with this, its your fault for installing some random person's plugin. Be smarter than that.
