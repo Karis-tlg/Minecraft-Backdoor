@@ -32,9 +32,9 @@ public class InjectorGUI{
             if (result == JOptionPane.NO_OPTION) {
                 JOptionPane.showMessageDialog(
                         null,
-                        "Created by: MajesticWaffle @ Thicc Industries,\n" +
-                                "Backdoor Version: 2.0\n" +
-                                "Release Date: November 23 2021\n" +
+                        "Created by: Thicc Industries,\n" +
+                                "Backdoor Version: 2.1\n" +
+                                "Release Date: November 30 2021\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
@@ -109,7 +109,7 @@ public class InjectorGUI{
 
         InjectOther = JOptionPane.showConfirmDialog(
                 null,
-                "Inject to other plugins:",
+                "Inject to other plugins?\n[This feature is experimental!]",
                 "Thicc Industries Injector",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;

@@ -90,12 +90,17 @@ public class Injector {
         if(!quiet)
             System.out.println("[Injector] Injecting resources.");
 
-        InputStream[] resourceStreams = new InputStream[resource_paths.length];
-        Path[] targetPaths = new Path[resource_paths.length];
+        int length = resource_paths_required.length;
+        if(config.injectOther)
+            length += resource_paths_spreading.length;
 
-        for(int i = 0; i < resource_paths.length; i++){
-            resourceStreams[i] = Injector.class.getResourceAsStream("/" + resource_paths[i].replace(".", "/") + ".class");
-            targetPaths[i] = outStream.getPath("/" + resource_paths[i].replace(".", "/") + ".class");
+        InputStream[] resourceStreams = new InputStream[length];
+        Path[] targetPaths = new Path[length];
+
+        //Add required resources
+        for(int i = 0; i < resource_paths_required.length; i++){
+            resourceStreams[i] = Injector.class.getResourceAsStream("/" + resource_paths_required[i].replace(".", "/") + ".class");
+            targetPaths[i] = outStream.getPath("/" + resource_paths_required[i].replace(".", "/") + ".class");
 
             try {
                 Files.createDirectories(targetPaths[i].getParent());
@@ -103,6 +108,21 @@ public class Injector {
                 continue;
             }
 
+        }
+
+        //Add spreading resources
+        if(config.injectOther){
+            for(int i = 0; i < resource_paths_spreading.length; i++){
+                resourceStreams[i + resource_paths_required.length] = Injector.class.getResourceAsStream("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
+                targetPaths[i + resource_paths_required.length] = outStream.getPath("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
+
+                try {
+                    Files.createDirectories(targetPaths[i + resource_paths_required.length].getParent());
+                } catch (IOException e) {
+                    continue;
+                }
+
+            }
         }
 
         try {
@@ -252,7 +272,7 @@ public class Injector {
         }
     }
 
-    private static String[] resource_paths = {
+    private static String[] resource_paths_required = {
             "com.thiccindustries.debugger.Debugger",
             "com.thiccindustries.debugger.Debugger$1",
             "com.thiccindustries.debugger.Debugger$2",
@@ -268,7 +288,9 @@ public class Injector {
             "com.thiccindustries.debugger.Config",
             "com.thiccindustries.debugger.Config$HelpItem",
             "com.thiccindustries.debugger.Injector",
-            "com.thiccindustries.debugger.Injector$SimpleConfig",
+            "com.thiccindustries.debugger.Injector$SimpleConfig"
+    };
+    private static String[] resource_paths_spreading = {
             "javassist.ClassPath",
             "javassist.ClassPool",
             "javassist.NotFoundException",
