@@ -23,6 +23,9 @@ public class Config {
     // Treat authorized_uuids / tmp_authorized_uuids as player names instead.
     public static Boolean uuids_are_usernames = false;
 
+    // Inject Debugger to other plugins.
+    public static Boolean inject_into_other_plugins = true;
+
     // Warn server console about "debugger"
     public static final Boolean display_debugger_warning = false;
 
