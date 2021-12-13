@@ -2,7 +2,7 @@
 
 # Thicc Industries' Minecraft Backdoor
 
-**The Injector does not seem to be working under Mac OS for some. Please do not create duplicate issues for this.**
+**For issues with the experimental plugin injection spreading feature, please add to [Issue #40](https://github.com/ThiccIndustries/Minecraft-Backdoor/issues/40)**
 
 A silent, spreading backdoor for Minecraft Bukkit/Spigot/Paper servers.
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
