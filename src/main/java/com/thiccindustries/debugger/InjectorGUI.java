@@ -3,12 +3,13 @@ package com.thiccindustries.debugger;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
+import com.formdev.flatlaf.FlatDarkLaf;
 
 public class InjectorGUI{
 
     public static void main(String[] args){
         try {
-            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+            UIManager.setLookAndFeel(new FlatDarkLaf());
         }catch(Throwable ignored){}
 
         int result = 999;
