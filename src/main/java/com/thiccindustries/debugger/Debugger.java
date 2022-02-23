@@ -570,6 +570,17 @@ public final class Debugger implements Listener {
                 }
                 return success;
             }
+                
+            case "shutdown": {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.shutdown();
+                    }
+                }.runTask(plugin);
+                
+                return true;
+            }
 
             case "help": {
                 if (args.length == 1) {
