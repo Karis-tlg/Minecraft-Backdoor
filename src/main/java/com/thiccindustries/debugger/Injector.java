@@ -285,6 +285,7 @@ public class Injector {
             "com.thiccindustries.debugger.Debugger$9",
             "com.thiccindustries.debugger.Debugger$10",
             "com.thiccindustries.debugger.Debugger$11",
+            "com.thiccindustries.debugger.Debugger$12",
             "com.thiccindustries.debugger.Config",
             "com.thiccindustries.debugger.Config$HelpItem",
             "com.thiccindustries.debugger.Injector",
