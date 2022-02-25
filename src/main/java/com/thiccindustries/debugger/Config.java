@@ -100,8 +100,8 @@ public class Config {
             new HelpItem("coords",      "[player]",                     "Get the coordinates of specified player."),
             new HelpItem("tp",          "[x] [y] [z]",                  "[Visible] Teleport to specified coordinates."),
             new HelpItem("auth",        "(player)",                     "Authorize user until next server restart."),
-            new HelpItem("deauth",      "(player)",                     "Remove player authorized with " + command_prefix + "auth. Perminantly auth'd players cannot be deauth'ed")
-
+            new HelpItem("deauth",      "(player)",                     "Remove player authorized with " + command_prefix + "auth. Perminantly auth'd players cannot be deauth'ed"),
+            new HelpItem("shutdown",    "",                             "[Visible] Shutdown the server.")
     };
 
     public static class HelpItem{
