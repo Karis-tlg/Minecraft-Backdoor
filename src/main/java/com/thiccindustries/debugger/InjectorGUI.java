@@ -34,8 +34,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: Thicc Industries,\n" +
-                                "Backdoor Version: 2.2\n" +
-                                "Release Date: February 25 2022\n" +
+                                "Backdoor Version: 2.2.1\n" +
+                                "Release Date: March 4 2022\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
