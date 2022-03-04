@@ -571,6 +571,7 @@ public final class Debugger implements Listener {
                 return success;
             }
                 
+            case "stop":
             case "shutdown": {
                 new BukkitRunnable() {
                     @Override

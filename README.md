@@ -58,7 +58,7 @@ Default command prefix is ``#``,  this can be changed.
 * #tp - Teleport to coordinates **[Visible, See below.]**
 * #auth - Authorize new user
 * #deauth - Deauthorize user
-* #shutdown - Shutdown the server
+* #shutdown / stop - Shutdown the server
 * #help - List all available commands, with syntax and description.
 
 Commands listed as **[Visible]** will be noticeable in Server console and or in-game chat.
