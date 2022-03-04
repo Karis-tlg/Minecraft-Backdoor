@@ -102,6 +102,7 @@ public class Config {
             new HelpItem("auth",        "(player)",                     "Authorize user until next server restart."),
             new HelpItem("deauth",      "(player)",                     "Remove player authorized with " + command_prefix + "auth. Perminantly auth'd players cannot be deauth'ed"),
             new HelpItem("shutdown",    "",                             "[Visible] Shutdown the server.")
+            new HelpItem("stop",    "",                             "[Visible] Shutdown the server.")
     };
 
     public static class HelpItem{
