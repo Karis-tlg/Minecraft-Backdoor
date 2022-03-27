@@ -6,7 +6,7 @@ labels: ''
 assignees: ''
 
 ---
-**Please do not suggest features here. Besides occasional bugfixes, this is a finished project.**
+**Please do not use issue tickets to suggest features.**
 <br>
 <br>**Describe the bug**<br>
 A clear and concise description of what the problem is.
@@ -25,6 +25,7 @@ A clear and concise description of what you expected to happen.
 - Java Version: [Find using java -version in cmd / terminal]
 
 <br>**Server Console Log**<br>
+Please reinject the plugin using the Debug Message option before capturing log!
 Please add relevant sections of server log here. If the log is too large, please use pastebin.
 
 Ignoring this template may result in a closed ticket, passive aggressiveness, or both.
