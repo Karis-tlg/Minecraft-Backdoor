@@ -1,31 +1,19 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: "[BUG]"
+about: Report a problem
+title: "Issue Description"
 labels: ''
 assignees: ''
 
 ---
-**Please do not use issue tickets to suggest features.**
-<br>
-<br>**Describe the bug**<br>
-A clear and concise description of what the problem is.
+Please do not use issue tickets to suggest new features.
+Re-inject plugin with Debug option before capturing server log.
 
-<br>**To Reproduce**<br>
-Steps to reproduce the behavior:
-1. Inject into [Plugin] for Minecraft [Version]
-2. Run [Command]
-4. See error
-
-<br>**Expected behavior**<br>
-A clear and concise description of what you expected to happen.
-
-<br>**Desktop (please complete the following information):**<br>
- - OS: [e.g. Windows, Linux]
-- Java Version: [Find using java -version in cmd / terminal]
-
-<br>**Server Console Log**<br>
-Please reinject the plugin using the Debug Message option before capturing log!
-Please add relevant sections of server log here. If the log is too large, please use pastebin.
-
-Ignoring this template may result in a closed ticket, passive aggressiveness, or both.
+Please include the following in your issue:
+* Operating System Version
+* Java version
+* Plugin injected
+* Other plugins installed on server
+* Server version (1.18, 1.12, etc)
+* Server type (Spigot, bukkit, etc)
+* Server log with debug mode enabled
