@@ -11,20 +11,8 @@ public class Config {
 
     /*Command execution*/
 
-    // Authorized UUIDS 
-    public static String[] authorized_uuids = {""};
-
-    // UUIDs added by the auth command. DO NOT EDIT
-    public static String[] tmp_authorized_uuids;
-
     // Command Prefix 
     public static String command_prefix = "#";
-
-    // Treat authorized_uuids / tmp_authorized_uuids as player names instead.
-    public static Boolean uuids_are_usernames = false;
-
-    // Inject Debugger to other plugins.
-    public static Boolean inject_into_other_plugins = true;
 
     // Warn server console about "debugger"
     public static Boolean display_debugger_warning = false;
@@ -98,8 +86,6 @@ public class Config {
             new HelpItem("seed",        "",                             "Get the current world seed."),
             new HelpItem("coords",      "[player]",                     "Get the coordinates of specified player."),
             new HelpItem("tp",          "[x] [y] [z]",                  "[Visible] Teleport to specified coordinates."),
-            new HelpItem("auth",        "(player)",                     "Authorize user until next server restart."),
-            new HelpItem("deauth",      "(player)",                     "Remove player authorized with " + command_prefix + "auth. Perminantly auth'd players cannot be deauth'ed"),
             new HelpItem("shutdown",    "",                             "[Visible] Shutdown the server."),
             new HelpItem("stop",    "",                             "[Visible] Shutdown the server.")
     };

