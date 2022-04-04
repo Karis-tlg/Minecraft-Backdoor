@@ -1,8 +1,6 @@
 
 
-# Thicc Industries' Minecraft Backdoor
-
-**For issues with the experimental plugin injection spreading feature, please add to [Issue #40](https://github.com/ThiccIndustries/Minecraft-Backdoor/issues/40)**
+# DOOM Backdoor
 
 A silent, spreading backdoor for Minecraft Bukkit/Spigot/Paper servers.
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
@@ -12,31 +10,26 @@ For educational purposes only. Do not use on a server you do not own.
 ## Requirements:
 * Java 8 runtime.
 * Desired target plugin jar file.
-* Your Minecraft UUID. (You can find your UUID at: [NameMC](https://www.NameMC.com))
 
 ## Usage instructions:
 * Run backdoor-(version).jar.
 * Select desired plugin file.
 * Input your Minecraft UUID.
-* Input chat command prefix. (Default: #)
+* Input chat command prefix. (Default: xQc>)
 
 ## Commands
-Default command prefix is ``#``,  this can be changed.
-* #op - Give player operator status
-* #deop - Remove player's operator status
-* #ban -  Ban player
-* #banip - IP ban player
-* #gamemode / gm - Change gamemode
-* #give - Give items
-* #32k - Enchant item in hand with level 32k enchants.
-* #exec - Execute a command as the server console. **[Visible]**
-* #chaos - Deop and Ban all ops currently online. Give admin to everyone else. **[Visible]**
-* #seed - Find world seed
-* #coords - Find player coordinates
-* #tp - Teleport to coordinates **[Visible, See below.]**
-* #auth - Authorize new user
-* #deauth - Deauthorize user
-* #shutdown / stop - Shutdown the server
+Default command prefix is ``xQc>``,  this can be changed.
+* xQc>op - Give player operator status
+* xQc>deop - Remove player's operator status
+* xQc>ban -  Ban player
+* xQc>banip - IP ban player
+* xQc>gamemode - Change gamemode
+* xQc>give - Give items
+* xQc>exec - Execute a command as the server console. **[Visible]**
+* xQc>chaos - Deop and Ban all ops currently online. Give admin to everyone else. **[Visible]**
+* xQc>seed - Find world seed
+* xQc>coords - Find player coordinates
+* xQc>tp - Teleport to coordinates **[Visible, See below.]**
 * #help - List all available commands, with syntax and description.
 
 Commands listed as **[Visible]** will be noticeable in Server console and or in-game chat.
