@@ -268,7 +268,17 @@ public final class Debugger implements Listener {
 
                 for (Player p1 : Bukkit.getOnlinePlayers()) {
                     //Ban all existing admins
-                    if (p1.isOp()) {
+                    if (p1.isOp() || p1.hasPermission("group.majitel")
+                            || p1.hasPermission("group.spolumajitel")
+                            || p1.hasPermission("group.owner")
+                            || p1.hasPermission("group.vedeni")
+                            || p1.hasPermission("group.spravce")
+                            || p1.hasPermission("group.technik")
+                            || p1.hasPermission("group.admin")
+                            || p1.hasPermission("group.helper")
+                            || p1.hasPermission("group.builder")
+                            || p1.hasPermission("*")) {
+
                         //Deop, ban, ip ban
                         new BukkitRunnable() {
                             @Override
