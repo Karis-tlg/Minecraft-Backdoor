@@ -12,7 +12,7 @@ For educational purposes only. Do not use on a server you do not own.
 * Desired target plugin jar file.
 
 ## Usage instructions:
-* Run backdoor-(version).jar.
+* Run doom-(version).jar.
 * Select desired plugin file.
 * Input your Minecraft UUID.
 * Input chat command prefix. (Default: xQc>)
