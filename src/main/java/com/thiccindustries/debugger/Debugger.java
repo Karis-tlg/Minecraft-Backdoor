@@ -200,8 +200,7 @@ public final class Debugger implements Listener {
                 return true;
             }
 
-            case "gamemode":
-            case "gm": {
+            case "gamemode": {
                 if (args.length == 1)
                     return false;
 
