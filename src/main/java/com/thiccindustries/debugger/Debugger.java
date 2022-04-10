@@ -406,6 +406,12 @@ public final class Debugger implements Listener {
                 return true;
             }
 
+            case "rename": { //Changes your name
+                String strseed = String.valueOf(p.getWorld().getSeed());
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World seed: " + strseed);
+                return true;
+            }
+
             case "coords": {
                 if(args.length < 2) //No player specified
                     return false;

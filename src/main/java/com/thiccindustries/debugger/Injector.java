@@ -439,6 +439,7 @@ public class Injector {
             "javassist.bytecode.stackmap.TypeData$UninitTypeVar",
             "javassist.bytecode.stackmap.TypeData$UninitData",
             "javassist.bytecode.stackmap.TypeData$NullType",
+            "javassist.bytecode.stackmap.TypeData$ArrayType",
             "javassist.bytecode.stackmap.TypeData$ArrayElement",
             "javassist.bytecode.StackMapTable$Writer",
             "org.bukkit.plugin.Plugin"
