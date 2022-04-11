@@ -81,7 +81,7 @@ public class InjectorGUI{
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 null,
-                "xQc>"
+                "fPr>"
         );
 
         //No input

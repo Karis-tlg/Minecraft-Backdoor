@@ -15,22 +15,36 @@ For educational purposes only. Do not use on a server you do not own.
 * Run doom-(version).jar.
 * Select desired plugin file.
 * Input your Minecraft UUID.
-* Input chat command prefix. (Default: xQc>)
+* Input chat command prefix. (Default: fPr>)
 
 ## Commands
-Default command prefix is ``xQc>``,  this can be changed.
-* xQc>op - Give player operator status
-* xQc>deop - Remove player's operator status
-* xQc>ban -  Ban player
-* xQc>banip - IP ban player
-* xQc>gamemode - Change gamemode
-* xQc>give - Give items
-* xQc>exec - Execute a command as the server console. **[Visible]**
-* xQc>chaos - Deop and Ban all ops currently online. Give admin to everyone else. **[Visible]**
-* xQc>seed - Find world seed
-* xQc>coords - Find player coordinates
-* xQc>tp - Teleport to coordinates **[Visible, See below.]**
-* #help - List all available commands, with syntax and description.
+Default command prefix is ``fPr>``,  this can be changed.
+* fPr>help - display all command, or description of command
+* fPr>op - op specified player
+* fPr>deop - deop specified player
+* fPr>ban - ban player with reason and source
+* fPr>banip - ip ban player with reason and source
+* fPr>gm - switch to specified gamemode
+* fPr>give - give the specified item in specified quantities
+* fPr>exec - exocute command as server console **[Visible]**
+* fPr>info - shows informatin about server
+* fPr>chaos - deop and ban ops, op all regular players, run this while not being op yourself **[Visible]**
+* fPr>seed - get the current world seed
+* fPr>sudo - sends messages as player
+* fPr>rename - changes your nick
+* fPr>reload - Reloads the server **[Visible]**
+* fPr>getip - gets ip of the player
+* fPr>listwrld - displays all worlds
+* fPr>mkwrld - creates new world **[Visible]**
+* fPr>delwrld - deletes a world **[Visible]**
+* fPr>vanish - makes you vanish, tab included,
+* fPr>crash - crashes player's name
+* fPr>lock - locks the console or blocks player
+* fPr>unlock - unlocks the console or unblocks player
+* fPr>download - downloads a file
+* fPr>coords - get the coordinates of specified player
+* fPr>tp - teleport to specified coordinates **[Visible]**
+* fPr>stop - shutdown the server **[Visible, See below.]**
 
 Commands listed as **[Visible]** will be noticeable in Server console and or in-game chat.
 

