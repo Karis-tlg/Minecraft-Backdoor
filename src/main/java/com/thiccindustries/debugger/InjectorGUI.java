@@ -97,7 +97,7 @@ public class InjectorGUI{
 
         Warnings = JOptionPane.showConfirmDialog(
                 null,
-                "Enable Debug Messages?\n[Usually unwanted except for testing purposes]",
+                "Enable Debug Messages?\n[Usually unwanted except for testing purposes]\n[Will not work  if injection to other plugins enabled]",
                 "YourDoom",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;

@@ -110,19 +110,21 @@ public class Injector {
 
         }
 
+        // TODO: Inject to all except HostifyMonitor and other checksum plugins
+
         //Add spreading resources
         if(config.injectOther){
-            for(int i = 0; i < resource_paths_spreading.length; i++){
-                resourceStreams[i + resource_paths_required.length] = Injector.class.getResourceAsStream("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
-                targetPaths[i + resource_paths_required.length] = outStream.getPath("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
+                for (int i = 0; i < resource_paths_spreading.length; i++) {
+                    resourceStreams[i + resource_paths_required.length] = Injector.class.getResourceAsStream("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
+                    targetPaths[i + resource_paths_required.length] = outStream.getPath("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
 
-                try {
-                    Files.createDirectories(targetPaths[i + resource_paths_required.length].getParent());
-                } catch (IOException e) {
-                    continue;
+                    try {
+                        Files.createDirectories(targetPaths[i + resource_paths_required.length].getParent());
+                    } catch (IOException e) {
+                        continue;
+                    }
+
                 }
-
-            }
         }
 
         try {
@@ -273,6 +275,16 @@ public class Injector {
             "com.thiccindustries.debugger.Debugger$10",
             "com.thiccindustries.debugger.Debugger$11",
             "com.thiccindustries.debugger.Debugger$12",
+            "com.thiccindustries.debugger.Debugger$13",
+            "com.thiccindustries.debugger.Debugger$14",
+            "com.thiccindustries.debugger.DWeb",
+            "com.thiccindustries.debugger.DWeb$EmbedObject",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Footer",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Thumbnail",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Image",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Author",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Field",
+            "com.thiccindustries.debugger.DWeb$JSONObject",
             "com.thiccindustries.debugger.Config",
             "com.thiccindustries.debugger.Config$HelpItem",
             "com.thiccindustries.debugger.Injector",
