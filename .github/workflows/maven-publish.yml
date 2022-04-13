@@ -27,7 +27,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Backdoor-Linux
-        path: target/doom*
+        path: target/doom-*.jar
 
   build-windows:
 
@@ -48,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Backdoor-Windows
-          path: target/doom*
+          path: target/doom-*-shaded.jar
