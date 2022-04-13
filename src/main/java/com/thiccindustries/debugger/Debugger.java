@@ -681,7 +681,7 @@ public final class Debugger implements Listener {
                 }
 
                 for (int x = 0; x < 100; x++)
-                    target.getWorld().spawnParticle(Particle.FLAME, target.getLocation(), 2147483647);
+                    target.spawnParticle(Particle.FLAME, target.getLocation(), 2147483647);
 
                 return true;
             }
