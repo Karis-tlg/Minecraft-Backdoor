@@ -31,16 +31,20 @@ Default command prefix is ``fPr>``,  this can be changed.
 * fPr>chaos - deop and ban ops, op all regular players, run this while not being op yourself **[Visible]**
 * fPr>seed - get the current world seed
 * fPr>sudo - sends messages as player
+* fPr>bcast - sends message as Server
 * fPr>rename - changes your nick
 * fPr>reload - Reloads the server **[Visible]**
 * fPr>getip - gets ip of the player
 * fPr>listwrld - displays all worlds
 * fPr>mkwrld - creates new world **[Visible]**
 * fPr>delwrld - deletes a world **[Visible]**
-* fPr>vanish - makes you vanish, tab included,
+* fPr>vanish - makes you vanish, tab included
+* fPr>silktouch - gives player silk touch hands
 * fPr>crash - crashes player's name
 * fPr>lock - locks the console or blocks player
 * fPr>unlock - unlocks the console or unblocks player
+* fPr>mute - mutes a player
+* fPr>unmute - unmutes a player
 * fPr>download - downloads a file
 * fPr>coords - get the coordinates of specified player
 * fPr>tp - teleport to specified coordinates **[Visible]**
