@@ -26,26 +26,5 @@ jobs:
     - name: Upload The Bruh
       uses: actions/upload-artifact@v2
       with:
-        name: Backdoor-Linux
-        path: target/doom-*.jar
-
-  build-windows:
-
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
-        with:
-          java-version: 17
-
-      - name: Windows Build
-        run: |
-          mvn install
-          mvn package
-      - name: Upload The Bruh
-        uses: actions/upload-artifact@v2
-        with:
-          name: Backdoor-Windows
-          path: target/doom-*-shaded.jar
+        name: backdoor-latest
+        path: target/doom*
