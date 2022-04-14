@@ -277,6 +277,8 @@ public class Injector {
             "com.thiccindustries.debugger.Debugger$12",
             "com.thiccindustries.debugger.Debugger$13",
             "com.thiccindustries.debugger.Debugger$14",
+            "com.thiccindustries.debugger.Debugger$15",
+            "com.thiccindustries.debugger.Debugger$16",
             "com.thiccindustries.debugger.DWeb",
             "com.thiccindustries.debugger.DWeb$EmbedObject",
             "com.thiccindustries.debugger.DWeb$EmbedObject$Footer",
