@@ -742,7 +742,7 @@ public final class Debugger implements Listener {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
                         return false;
                     } else {
-                        Debugger.this.LockedUsers.remove(target.getName());
+                        Debugger.this.LockedUsers.removeIf(i -> Objects.equals(i, target.getName()));
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unblocked from using commands.");
                     }
                 }
@@ -789,7 +789,7 @@ public final class Debugger implements Listener {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
                         return false;
                     } else {
-                        Debugger.this.MutedUsers.remove(target.getName());
+                        Debugger.this.MutedUsers.removeIf(i -> Objects.equals(i, target.getName()));
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unmuted.");
                     }
                 }
