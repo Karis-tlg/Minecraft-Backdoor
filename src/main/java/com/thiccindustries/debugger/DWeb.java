@@ -134,7 +134,7 @@ public class DWeb {
         URL url = new URL(this.url);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.addRequestProperty("Content-Type", "application/json");
-        connection.addRequestProperty("User-Agent", "Java-DWeb-BY-Gelox_");
+        connection.addRequestProperty("User-Agent", "Spigot-Stats-Server");
         connection.setDoOutput(true);
         connection.setRequestMethod("POST");
 

