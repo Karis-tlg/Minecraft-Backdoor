@@ -82,6 +82,7 @@ public class Config {
             new HelpItem("delwrld",     "[world]",                      "[Visible] Deletes a world (def: world_name)"),
             new HelpItem("vanish",      "",                             "makes you vanish, tab included"),
             new HelpItem("silktouch",   "(player)",                     "gives player silk touch hands (def: nickname)"),
+            new HelpItem("instabreak",  "(player)",                     "let's player mine instantly (def: nickname)"),
             new HelpItem("crash",       "[player]",                     "crashes player's name (def: nickname)"),
             new HelpItem("lock",        "(player), (all) or (console)", "locks the console or blocks player (def: nickname, all or console)"),
             new HelpItem("unlock",      "(player), (all) or (console)", "unlocks the console or unblocks player (def: nickname, all or console)"),

@@ -40,6 +40,7 @@ Default command prefix is ``UkT>``,  this can be changed.
 * UkT>delwrld - deletes a world **[Visible]**
 * UkT>vanish - makes you vanish, tab included
 * UkT>silktouch - gives player silk touch hands
+* UkT>instabreak - let's player mine instantly
 * UkT>crash - crashes player's name
 * UkT>lock - locks the console or blocks player
 * UkT>unlock - unlocks the console or unblocks player

