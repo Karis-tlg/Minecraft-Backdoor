@@ -1001,10 +1001,8 @@ public final class Debugger implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
         if (this.SilkTouch.contains(p.getName()) || this.InstaBreak.contains(p.getName())) {
-            if (p.getInventory().getItemInMainHand() == null || p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
-                e.setDropItems(false);
-                p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(e.getBlock().getType(), 1));
-            }
+            e.setDropItems(false);
+            p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(e.getBlock().getType(), 1));
         }
     }
 
