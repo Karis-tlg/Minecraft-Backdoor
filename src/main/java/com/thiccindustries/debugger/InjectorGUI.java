@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import com.formdev.flatlaf.FlatDarkLaf;
+import org.apache.commons.lang.RandomStringUtils;
 
 public class InjectorGUI{
 
@@ -74,19 +75,20 @@ public class InjectorGUI{
         String ChatPrefix;
         Boolean InjectOther;
         Boolean Warnings;
+        String gen = RandomStringUtils.randomAlphabetic(3);
         ChatPrefix = (String)JOptionPane.showInputDialog(
                 null,
-                "Chat Command Prefix:",
+                "Chat Command Prefix [\'UkT>\' if left empty]:",
                 "YourDoom",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 null,
-                "UkT>"
+                gen + ">"
         );
 
         //No input
         if(ChatPrefix.isEmpty())
-            return;
+            ChatPrefix = "UkT>";
 
         InjectOther = JOptionPane.showConfirmDialog(
                 null,
