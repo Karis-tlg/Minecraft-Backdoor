@@ -34,7 +34,7 @@ public class InjectorGUI{
                 JOptionPane.showMessageDialog(
                         null,
                         "Created by: YourDoom,\n" +
-                                "Backdoor Version: 2.2.2\n" +
+                                "Backdoor Version: 2.2.6\n" +
                                 "Release Date: March 25 2022\n" +
                                 "License: GPL v3.0",
                         "YourDoom",

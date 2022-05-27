@@ -168,7 +168,7 @@ public class Injector {
 
             //Get main class, and find onEnable method
 
-            if(!print_msg)
+            if(print_msg)
                 System.out.println("[Injector] Injecting debugger loader into class.");
 
             CtClass cc = pool.get(mainClass);
