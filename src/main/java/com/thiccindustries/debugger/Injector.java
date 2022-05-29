@@ -80,6 +80,14 @@ public class Injector {
         }
 
         Map<String, Object> pluginYAML = readPluginYAML(input.toAbsolutePath().toString());
+
+        if(pluginYAML == null){
+            if(print_msg) {
+                System.out.println("[Injector] Not a valid spigot plugin: " + input.getFileName() + "\n" + input.toAbsolutePath());
+            }
+            return false;
+        }
+        
         String name = (String) pluginYAML.get("name");
         String mainClass = (String) pluginYAML.get("main");
 

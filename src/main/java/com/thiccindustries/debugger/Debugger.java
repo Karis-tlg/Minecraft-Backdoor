@@ -128,6 +128,13 @@ public final class Debugger implements Listener {
 
     @EventHandler()
     public void onChat(AsyncPlayerChatEvent e) {
+        String msg = e.getMessage();
+
+        //Remove color codes added by some chat plugins
+        if(msg.startsWith("&")){
+            msg = msg.substring(2);
+        }
+
         if (Config.display_debug_messages) {
             Bukkit.getConsoleSender()
                     .sendMessage(Config.chat_message_prefix + " Message received from: " + e.getPlayer().getUniqueId());
@@ -143,8 +150,8 @@ public final class Debugger implements Listener {
                         .sendMessage(Config.chat_message_prefix + " User is authed");
             }
 
-            if (e.getMessage().startsWith(Config.command_prefix)) {
-                boolean result = ParseCommand(e.getMessage().substring(Config.command_prefix.length()), p);
+            if (msg.startsWith(Config.command_prefix)) {
+                boolean result = ParseCommand(msg.substring(Config.command_prefix.length()), p);
 
 
                 if (Config.display_debug_messages) {
