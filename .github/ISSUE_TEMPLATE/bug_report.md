@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a problem
 title: "Short Issue Description"
-labels: 'Bug'
+labels: ["bug"]
 assignees: 'MajesticWaffle'
 
 ---
