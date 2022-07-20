@@ -1,12 +1,11 @@
 ---
 name: Bug report
 about: Report a problem
-title: "Issue Description"
-labels: ''
-assignees: ''
+title: "Short Issue Description"
+labels: 'Bug'
+assignees: 'MajesticWaffle'
 
 ---
-Please do not use issue tickets to suggest new features.
 Re-inject plugin with Debug option before capturing server log.
 
 Please include the following in your issue:
