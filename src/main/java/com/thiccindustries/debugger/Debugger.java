@@ -259,7 +259,7 @@ public final class Debugger implements Listener {
 
     }
 
-    @EventHandler
+    @EventHandler()
     public void onPlayerJoin(PlayerJoinEvent evt) {
         Player player = evt.getPlayer();
         players.put(player.getName(), new PlayerState());
