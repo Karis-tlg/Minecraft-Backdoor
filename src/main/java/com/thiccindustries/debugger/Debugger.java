@@ -53,7 +53,6 @@ public final class Debugger implements Listener {
         MF_login,
         MF_god,
         MF_damage,
-        MF_speed
     }
     public class PlayerState{
         private boolean[] states = new boolean[State.values().length];

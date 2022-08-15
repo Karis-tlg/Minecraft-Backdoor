@@ -136,7 +136,7 @@ public class Config {
             new HelpItem("crash", "crashes player's name",
                     new Param[]{new Param("player", "player to crash", false)}),
             new HelpItem("troll", "Troll player in various ways",
-                    new Param[]{new Param("method", "Options: clear, thrower, interact, cripple, flight, inventory, drop, teleport, mine, place, login, god, damage, speed", true),
+                    new Param[]{new Param("method", "Options: clear, thrower, interact, cripple, flight, inventory, drop, teleport, mine, place, login, god, damage", true),
                                 new Param("player", "player to troll", true),}),
             new HelpItem("lock", "locks the console or blocks player",
                     new Param[]{new Param("player", "'server', 'all', or player to lock", true)}),

