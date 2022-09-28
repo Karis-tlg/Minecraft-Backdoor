@@ -16,7 +16,8 @@ For educational purposes only. Do not use on a server you do not own.
 * Select desired plugin file.
 * Input your Minecraft UUID.
 * Input chat command prefix. (Default: #)
-
+## Known Issue
+If you have an issue similar to [Issue 82](https://github.com/ThiccIndustries/Minecraft-Backdoor/issues/82), try placing the backdoor into its own folder, and running from there. Do not try to run from the Start Menu.
 ## CLI Usage:
 Java -jar backdoor.jar (filename) [options]
 * --help / -h : Display syntax message in console
