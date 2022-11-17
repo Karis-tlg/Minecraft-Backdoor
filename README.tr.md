@@ -17,10 +17,10 @@ Tamamen eğitim amaçlı. Sahibi veya kullanma izinin olmayan sunucularda kullan
 * Minecraft UUID'ni gir.
 * Önek belirle. (Varsayılan: #)
 ## Bilinen Sorunlar
-Eğer [Issue 82](https://github.com/ThiccIndustries/Minecraft-Backdoor/issues/82)'ya benzer bir sorun yaşıyor iseniz, backdoor'u kendi klasörüne koyup ordan çalıştırmayı deneyin. Başlat Menüsünden çalıştırmayın.
+Eğer [Sorun 82](https://github.com/ThiccIndustries/Minecraft-Backdoor/issues/82)'ya benzer bir sorun yaşıyor iseniz, backdoor'u kendi klasörüne koyup ordan çalıştırmayı deneyin. Başlat Menüsünden çalıştırmayın.
 ## CLI Kullanımı:
 Java -jar backdoor.jar (filename) [options]
-* --help / -h : Display syntax message in console
+* --help / -h : Yardım mesajını göster
 * --offline / -o : UUID yerine kullanıcı adı kullan
 * --users / -u : Yetkili kullanıcıların UUID'leri veya kullanıcı adları. Eğer boş ise, herkes komutları kullanabilir.
 * --prefix / -p (Default: '#') : Backdoor komutları için önek.
