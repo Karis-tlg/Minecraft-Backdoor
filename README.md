@@ -7,6 +7,8 @@ Using the injector is recommended, should you choose to manually backdoor a plug
 
 For educational purposes only. Do not use on a server you do not own.
 
+Read in [Turkish](README.tr.md)
+
 ## Requirements:
 * Java 8 runtime.
 * Desired target plugin jar file.
