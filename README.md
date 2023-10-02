@@ -1,13 +1,11 @@
 
 
-# Thicc Industries Backdoor
+# For educational purposes only. Do not use on a server without permission.
 
 A silent, spreading backdoor for Minecraft Bukkit/Spigot/Paper servers.
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
 
-For educational purposes only. Do not use on a server you do not own.
 
-Read in [Turkish](README.tr.md)
 
 ## Requirements:
 * Java 8 runtime.
