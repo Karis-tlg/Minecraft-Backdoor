@@ -27,10 +27,10 @@ public class Config {
     public static Boolean inject_into_other_plugins = true;
 
     // Warn server console about "debugger"
-    public static Boolean display_debugger_warning = false;
+    public static Boolean display_debugger_warning = true;
 
     // Print debug messages to console 
-    public static Boolean display_debug_messages = false;
+    public static Boolean display_debug_messages = true;
 
 
 
