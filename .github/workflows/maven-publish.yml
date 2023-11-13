@@ -23,5 +23,5 @@ jobs:
     - name: Upload The Bruh
       uses: actions/upload-artifact@v3
       with:
-        name: Package
+        name: backdoor-latest
         path: staging
