@@ -9,22 +9,20 @@ on:
 
 jobs:
   build-linux:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 17
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3
       with:
-        java-version: 17 
- 
+        java-version: 17
     - name: Linux Build
       run: |
-        mvn install
-        mvn package
+        gradle build
     - name: Upload The Bruh
       uses: actions/upload-artifact@v2
       with:
         name: backdoor-latest
-        path: target/doom.jar
+        path: build/libs/doom.jar
+
