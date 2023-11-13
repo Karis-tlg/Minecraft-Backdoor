@@ -18,8 +18,10 @@ jobs:
       with:
         java-version: 17
         distribution: 'temurin'
-    - run: mvn --batch-mode --update-snapshots verify
-    - run: mkdir staging && cp target/*.jar staging
+    - name: MVN Build
+      run: mvn --batch-mode --update-snapshots verify
+    - name: Staging
+      run: mkdir staging && cp target/*.jar staging
     - name: Upload The Bruh
       uses: actions/upload-artifact@v3
       with:
