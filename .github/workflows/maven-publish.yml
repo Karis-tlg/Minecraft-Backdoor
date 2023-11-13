@@ -21,10 +21,10 @@ jobs:
  
     - name: Linux Build
       run: |
-        ./gradlew build
+        mvn install
+        mvn package
     - name: Upload The Bruh
       uses: actions/upload-artifact@v2
       with:
         name: backdoor-latest
-        path: build/doom*
-
+        path: target/doom.jar
